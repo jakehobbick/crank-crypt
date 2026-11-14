@@ -143,6 +143,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
 .gmid{text-align:center;min-width:64px}.gmid small{display:block;font-size:10px;letter-spacing:.14em;color:var(--mut)}.gmid b{font-size:26px;line-height:1}.gmid em{display:block;font-size:10px;color:var(--gold);font-style:normal}
 .node.sel circle.bg{stroke:#fff;stroke-width:4}
 .keyrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.keyrow span{flex:1}.keyrow kbd{background:#2d2438;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-family:inherit;min-width:70px;text-align:center}
+@media (pointer:coarse){#gearBox{flex-direction:column-reverse;right:12px;top:50%;bottom:auto;transform:translateY(-50%);padding:8px;gap:8px;border-radius:18px}
+#gearBox .gbtn{width:78px;height:78px;font-size:34px;border-radius:14px;touch-action:manipulation}#gearBox .gbtn:active{background:#4a3a5c;transform:scale(.96)}
+#gUp{background:linear-gradient(180deg,#ff8a4c,#c2410c)!important;color:#fff}#gDown{background:linear-gradient(180deg,#5cc8ff,#1d6f9c)!important;color:#fff}
+.gmid b{font-size:32px}}
 @media (pointer:coarse){.btn{min-height:48px;font-size:17px}.btn.sm{min-height:40px}.iconbtn{width:44px;height:44px;font-size:18px}.pot{width:42px;height:42px;font-size:22px}.choice{padding:14px 16px;min-height:60px}.field input,.field select{min-height:46px}#sprintBtn{min-height:48px}#demo .btn.sm{min-width:44px}}
 @media (max-width:640px){#demo{flex-wrap:nowrap;gap:5px;padding:6px}#demo .grp{padding:4px 5px;gap:4px}#demo .grp b,#sprintBtn .lg{display:none}#demo .grp .num{min-width:34px;font-size:18px}#demo .btn.sm{padding:6px 10px}#sprintBtn{padding:9px 10px;font-size:13px}.relics{display:none}.hpbar{width:100px}.live .v{font-size:22px}#rhName{display:none}}
 </style>
@@ -235,7 +239,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
   <div class="grp"><b>RPM</b><button class="btn sm sec" data-c="-5">−</button><span class="num" id="dmC">85</span><button class="btn sm sec" data-c="5">+</button></div>
 </div>
 
-<div id="gearBox"><button class="gbtn" id="gDown">−</button><div class="gmid"><small>GEAR</small><b class="num" id="gearNum">6</b><em id="gearW"></em></div><button class="gbtn" id="gUp">+</button></div>
+<div id="gearBox"><button class="gbtn" id="gDown" title="Easier gear">−</button><div class="gmid"><small>GEAR</small><b class="num" id="gearNum">6</b><em id="gearW"></em></div><button class="gbtn" id="gUp" title="Harder gear">+</button></div>
 <div id="toast"></div>
 <div id="achPop"></div>
 
@@ -2224,7 +2228,7 @@ function initUI(){
     else if(e.key===' '){demo.sprint=true;e.preventDefault()}
     else if(e.key==='Escape'||e.key==='p'){if(state.screen!=='title'){state.paused=!state.paused;show('pause',state.paused)}}});
   addEventListener('keyup',e=>{if(e.key===' ')demo.sprint=false});
-  $('gUp').onclick=()=>shift(1);$('gDown').onclick=()=>shift(-1);
+  for(const [id,d] of [['gUp',1],['gDown',-1]]){$(id).addEventListener('pointerdown',e=>{e.preventDefault();shift(d)})}
   $('btnKeys').onclick=()=>keysScreen();
   $('btnAch').onclick=()=>achScreen();$('mapAch').onclick=()=>achScreen();
   $('btnCont').onclick=()=>{audioInit();if(loadRun()){demo.watts=Math.round(F()*.55);setScreen('map');refreshTop();renderMap();setTrainer({mode:'erg',w:.55})}};
