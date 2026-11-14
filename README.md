@@ -1,6 +1,6 @@
 # Crank Crypt
 
-A Slay-the-Spire-style dungeon run you play on a smart trainer. Three acts, 12 bosses, 100 achievements.
+A Slay-the-Spire-style dungeon run you play on a smart trainer. Three acts, 15 bosses, 103 achievements, 20 heroes, and a Grimoire (manga) art style.
 
 **Play:** https://jakehobbick.github.io/crank-crypt/
 
