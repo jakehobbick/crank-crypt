@@ -174,6 +174,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
         <div class="conn"><span class="dot" id="dotH"></span><div class="lbl">Heart rate<small id="stH">Optional</small></div><button class="btn sm sec" id="btnH">Connect</button></div>
       </div>
       <div class="note" id="btNote"></div>
+      <div id="btLogWrap" style="display:none;margin-top:8px"><div class="note">Connection log (screenshot this if it fails):</div><pre id="btLogBox" style="font-size:11px;white-space:pre-wrap;background:#0b080e;border:1px solid var(--line);border-radius:8px;padding:8px;max-height:160px;overflow:auto;color:#cfc6da;user-select:text;-webkit-user-select:text"></pre></div>
     </div>
 
     <div class="sect">
@@ -294,52 +295,56 @@ function cpWrite(bytes){
   ble.q=ble.q.then(()=>{const c=ble.cp;if(!c)return;const d=new Uint8Array(bytes);return c.writeValueWithResponse?c.writeValueWithResponse(d):c.writeValue(d)}).catch(e=>console.warn('CP write',e));
   return ble.q;
 }
+const U=n=>'0000'+n.toString(16).padStart(4,'0')+'-0000-1000-8000-00805f9b34fb';
+const errMsg=e=>(e&&(e.message||e.name))||(typeof e==='string'?e:JSON.stringify(e))||'unknown error';
+const btLog=[];function blog(m){btLog.push(new Date().toLocaleTimeString()+' '+m);if(btLog.length>40)btLog.shift();const el=$('btLogBox');if(el)el.textContent=btLog.join('\n')}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function connectTrainer(){
   audioInit();
   if(!navigator.bluetooth){toast('No Bluetooth here');btSupportNote();return}
+  let step='choosing device';const st=m=>{step=m;$('stT').textContent=m[0].toUpperCase()+m.slice(1)+'…';blog(m)};
   try{
-    const dev=await navigator.bluetooth.requestDevice({filters:[{services:[0x1826]},{services:[0x1818]}],optionalServices:[0x1826,0x1818,0x180d]});
-    $('stT').textContent='Connecting…';
-    dev.addEventListener('gattserverdisconnected',()=>{sens.src='demo';ble.cp=null;ble.ctrl=false;$('dotT').classList.remove('ok');$('stT').textContent='Disconnected';toast('Trainer disconnected');updateDemoVis()});
-    const srv=await dev.gatt.connect();
-    let ftms=null;try{ftms=await srv.getPrimaryService(0x1826)}catch(e){}
+    st('choosing device');
+    const opt=[U(0x1826),U(0x1818),U(0x180d),U(0x180a)];let dev;
+    try{dev=await navigator.bluetooth.requestDevice({filters:[{services:[U(0x1826)]},{services:[U(0x1818)]},{namePrefix:'KICKR'}],optionalServices:opt})}
+    catch(e){if(e&&e.name==='NotFoundError')throw e;blog('filtered picker failed: '+errMsg(e)+', trying all devices');dev=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:opt})}
+    blog('picked '+(dev.name||dev.id));
+    dev.addEventListener('gattserverdisconnected',()=>{sens.src='demo';ble.cp=null;ble.ctrl=false;$('dotT').classList.remove('ok');$('stT').textContent='Disconnected';blog('disconnected');toast('Trainer disconnected');updateDemoVis()});
+    st('connecting');let srv=null;
+    for(let i=1;i<=3&&!srv;i++){try{srv=await dev.gatt.connect()}catch(e){blog('connect attempt '+i+' failed: '+errMsg(e));if(i===3)throw e;await sleep(800)}}
+    await sleep(300);
+    st('finding trainer service');let ftms=null;try{ftms=await srv.getPrimaryService(U(0x1826))}catch(e){blog('no FTMS: '+errMsg(e))}
+    let gotData=false;
     if(ftms){
-      const ibd=await ftms.getCharacteristic(0x2ad2);
-      ibd.addEventListener('characteristicvaluechanged',e=>parseIBD(e.target.value));
-      await ibd.startNotifications();
-      try{
-        const cp=await ftms.getCharacteristic(0x2ad9);
-        cp.addEventListener('characteristicvaluechanged',()=>{});
-        await cp.startNotifications();
-        ble.cp=cp;await cpWrite([0x00]);await cpWrite([0x07]);ble.ctrl=true;
-      }catch(e){console.warn('No control point',e)}
-    }else{
-      const cps=await srv.getPrimaryService(0x1818);
-      const m=await cps.getCharacteristic(0x2a63);
-      m.addEventListener('characteristicvaluechanged',e=>parseCPS(e.target.value));
-      await m.startNotifications();
+      try{st('subscribing to trainer data');const ibd=await ftms.getCharacteristic(U(0x2ad2));ibd.addEventListener('characteristicvaluechanged',e=>parseIBD(e.target.value));await ibd.startNotifications();gotData=true}
+      catch(e){blog('trainer data failed: '+errMsg(e))}
+      try{st('requesting trainer control');const cp=await ftms.getCharacteristic(U(0x2ad9));cp.addEventListener('characteristicvaluechanged',()=>{});await cp.startNotifications();
+        ble.cp=cp;const d=new Uint8Array([0x00]);await (cp.writeValueWithResponse?cp.writeValueWithResponse(d):cp.writeValue(d));await sleep(200);await cpWrite([0x07]);ble.ctrl=true}
+      catch(e){ble.cp=null;ble.ctrl=false;blog('control failed: '+errMsg(e))}
     }
+    if(!gotData){st('subscribing to power meter');const cps=await srv.getPrimaryService(U(0x1818));const m=await cps.getCharacteristic(U(0x2a63));
+      m.addEventListener('characteristicvaluechanged',e=>parseCPS(e.target.value));await m.startNotifications();gotData=true}
     ble.dev=dev;sens.src='ble';sens.lastP=performance.now();
     $('dotT').classList.add('ok');achInc('trainer');
-    $('stT').textContent=(dev.name||'Trainer')+(ble.ctrl?' · ERG/SIM control ✓':' · power only');
+    $('stT').textContent=(dev.name||'Trainer')+(ble.ctrl?' · ERG/SIM control ✓':' · power only (no trainer control)');blog('connected, control='+ble.ctrl);
     updateDemoVis();ble.mode=null;applyTrainer(true);
   }catch(e){
-    if(e.name==='NotFoundError'){$('stT').textContent='Not connected (manual controls)';return}
-    $('stT').textContent='Failed: '+e.message;
-    if(e.name==='SecurityError'||/permission|policy|disallowed/i.test(e.message))$('btNote').innerHTML='This page is in a frame that blocks Bluetooth. Open the downloaded <b>.html file in Chrome</b> instead.';
+    if(e&&e.name==='NotFoundError'){$('stT').textContent='Not connected (manual controls)';blog('picker cancelled');return}
+    $('stT').textContent='Failed while '+step+': '+errMsg(e);blog('FAILED while '+step+': '+errMsg(e));
+    $('btLogWrap').style.display='';
   }
 }
 async function connectHR(){
   audioInit();
   if(!navigator.bluetooth){toast('No Bluetooth here');return}
   try{
-    const dev=await navigator.bluetooth.requestDevice({filters:[{services:[0x180d]}]});
-    const srv=await dev.gatt.connect();const s=await srv.getPrimaryService(0x180d);const c=await s.getCharacteristic(0x2a37);
+    const dev=await navigator.bluetooth.requestDevice({filters:[{services:[U(0x180d)]}]});
+    const srv=await dev.gatt.connect();const s=await srv.getPrimaryService(U(0x180d));const c=await s.getCharacteristic(U(0x2a37));
     c.addEventListener('characteristicvaluechanged',e=>{const v=e.target.value;const f=v.getUint8(0);sens.hr=(f&1)?v.getUint16(1,true):v.getUint8(1);sens.lastHR=performance.now();sens.hrOK=true});
     await c.startNotifications();
     dev.addEventListener('gattserverdisconnected',()=>{$('dotH').classList.remove('ok');$('stH').textContent='Disconnected';sens.hrOK=false});
     $('dotH').classList.add('ok');$('stH').textContent=dev.name||'Connected';achInc('hr');
-  }catch(e){if(e.name!=='NotFoundError')$('stH').textContent='Failed: '+e.message}
+  }catch(e){if(!(e&&e.name==='NotFoundError'))$('stH').textContent='Failed: '+errMsg(e)}
 }
 function parseIBD(dv){
   try{
