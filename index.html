@@ -1973,6 +1973,71 @@ async function exportRide(S,start){
 }
 function stashLastRide(){if(!run||!run.samples||run.samples.length<10)return;try{LS.set('lastRide',{start:run.startedAt||Date.now(),samples:run.samples.map(x=>[x.t||0,x.p,x.c,x.hr])})}catch(e){}}
 function lastRide(){const r=LS.get('lastRide',null);if(!r)return null;return {start:r.start,samples:r.samples.map(a=>({t:a[0]||0,p:a[1],c:a[2],hr:a[3]}))}}
+/* --- share card --- */
+function shareText(won,st){
+  const B=BOSSES[run.bosses[run.act]],A=ACTS[run.act];
+  const title=won?'Crank Crypt · Conquered the Depths 👑':run.cur==='boss'?`Crank Crypt · Fell to ${B.name.replace(/^The /,'the ')} (Act ${A.roman})`:`Crank Crypt · Fell on floor ${run.cur?run.cur.r+1:1} of Act ${A.roman}`;
+  const newAch=ACH_LIST.filter(a=>(ACHS.unlocked[a.id]||0)>=(run.startedAt||0));
+  const lines=[
+    `⚔️ ${run.roomsCleared} rooms cleared · reached Act ${A.roman}: ${A.name}`,
+    run.bossesBeaten.length?`👑 Bosses slain: ${run.bossesBeaten.map(k=>BOSSES[k].name.replace(/^The /,'')).join(', ')}`:`💀 Undone by ${B.name.replace(/^The /,'')}`,
+    (run.weapon||run.relics.length)?`🎒 Relics: ${(run.weapon?run.weapon.ic+' ':'')+run.relics.map(k=>RELICS[k].ic).join(' ')}`:null,
+    `⚡ ${Math.floor(st.secs/3600)?Math.floor(st.secs/3600)+'h '+Math.floor(st.secs%3600/60)+'m':Math.floor(st.secs/60)+' min'} · avg ${Math.round(st.avg)} W · NP ${Math.round(st.np)} W · IF ${st.IF.toFixed(2)} · TSS ${Math.round(st.tss)} · ${Math.round(st.kj)} kJ${st.avgHr?` · avg HR ${Math.round(st.avgHr)}`:''}`,
+    newAch.length?`🏆 ${newAch.length} achievement${newAch.length>1?'s':''} unlocked: ${newAch.slice(0,4).map(a=>a.name).join(', ')}${newAch.length>4?'…':''}`:null,
+    `Crank Crypt: a dungeon run powered by my legs 🚴`].filter(Boolean);
+  return {title,desc:lines.join('\n')};
+}
+function makeShareCard(won,st){
+  const CW=1080,CH=1350,cv2=document.createElement('canvas');cv2.width=CW;cv2.height=CH;const c=cv2.getContext('2d');
+  const sw=[W,H];W=CW;H=900;
+  try{
+    const A=ACTS[run.act],bk=run.bosses[run.act],B=BOSSES[bk];
+    dungeonBG(c,0,3.2,{tint:A.boss});const s=1.15,gy=groundY();
+    B.draw(c,W*.7,gy,s,3.2,{k:'band',hot:!won});
+    drawHero(c,W*.27,gy,1.45,{swing:won?1.4:null,plume:'#f5c451',glow:won?'rgba(255,209,102,.35)':null,phase:1.1});
+    if(won){c.save();c.globalCompositeOperation='lighter';const g=c.createRadialGradient(W*.7,gy-150,10,W*.7,gy-150,320);g.addColorStop(0,'rgba(255,220,120,.35)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(0,0,W,H);c.restore()}
+    else{c.fillStyle='rgba(120,0,0,.18)';c.fillRect(0,0,W,H)}
+    vignette(c);
+    // header
+    const hg=c.createLinearGradient(0,0,0,220);hg.addColorStop(0,'rgba(8,6,10,.92)');hg.addColorStop(1,'rgba(8,6,10,0)');c.fillStyle=hg;c.fillRect(0,0,CW,240);
+    c.textAlign='center';c.font='800 92px Cinzel';const lg=c.createLinearGradient(0,40,0,130);lg.addColorStop(0,'#ffe2a8');lg.addColorStop(.6,'#f5a041');lg.addColorStop(1,'#b4521f');
+    c.lineWidth=8;c.strokeStyle='rgba(0,0,0,.7)';c.strokeText('CRANK CRYPT',CW/2,125);c.fillStyle=lg;c.fillText('CRANK CRYPT',CW/2,125);
+    c.font='700 40px Cinzel';c.fillStyle=won?'#ffd99a':'#ff9b9b';c.strokeStyle='rgba(0,0,0,.8)';c.lineWidth=6;
+    const sub=won?'THE DEPTHS ARE CONQUERED':run.cur==='boss'?`FELL TO ${B.name.toUpperCase()}`:`FELL IN ACT ${A.roman}`;c.strokeText(sub,CW/2,185);c.fillText(sub,CW/2,185);
+    c.font='500 26px Inter';c.fillStyle='#d8cfe0';c.fillText(`${new Date(run.startedAt||Date.now()).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})} · Act ${A.roman}: ${A.name}`,CW/2,228);
+  }finally{W=sw[0];H=sw[1]}
+  // panel
+  const py=850;const pg=c.createLinearGradient(0,py-60,0,CH);pg.addColorStop(0,'rgba(14,11,18,0)');pg.addColorStop(.12,'rgba(14,11,18,.96)');pg.addColorStop(1,'#0e0b12');c.fillStyle=pg;c.fillRect(0,py-60,CW,CH-py+60);
+  // power graph
+  const S=run.samples,gx=60,gw=CW-120,gyy=py+20,gh=110;
+  if(S.length>20){const n=Math.min(S.length,600),step=S.length/n,pts=[];let mx=1;
+    for(let i=0;i<n;i++){let sum=0,cnt=0;for(let j=Math.floor(i*step);j<Math.floor((i+1)*step);j++){sum+=S[j].p;cnt++}const v=cnt?sum/cnt:0;pts.push(v);mx=Math.max(mx,v)}
+    mx=Math.max(mx,F()*1.6);const X=i=>gx+i/(n-1)*gw,Y=v=>gyy+gh-v/mx*gh;
+    const ag=c.createLinearGradient(0,gyy,0,gyy+gh);ag.addColorStop(0,'rgba(255,122,61,.85)');ag.addColorStop(1,'rgba(124,58,237,.25)');c.fillStyle=ag;
+    c.beginPath();c.moveTo(X(0),gyy+gh);pts.forEach((v,i)=>c.lineTo(X(i),Y(v)));c.lineTo(X(n-1),gyy+gh);c.closePath();c.fill();
+    c.strokeStyle='rgba(255,255,255,.35)';c.setLineDash([6,6]);c.lineWidth=2;c.beginPath();c.moveTo(gx,Y(F()));c.lineTo(gx+gw,Y(F()));c.stroke();c.setLineDash([]);
+    c.font='600 20px Inter';c.textAlign='left';c.fillStyle='rgba(255,255,255,.55)';c.fillText('FTP',gx+6,Y(F())-6);c.fillText('POWER',gx,gyy-10)}
+  // stat tiles
+  const fmtH=x=>{x=Math.round(x);const h=Math.floor(x/3600),m=Math.floor(x%3600/60),sec=x%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${m}:${String(sec).padStart(2,'0')}`};
+  const tiles=[['TIME',fmtH(st.secs)],['AVG POWER',Math.round(st.avg)+' W'],['NP',Math.round(st.np)+' W'],['TSS',String(Math.round(st.tss))],['WORK',Math.round(st.kj)+' kJ'],st.avgHr?['AVG HR',Math.round(st.avgHr)+' bpm']:['ROOMS',String(run.roomsCleared)]];
+  const tw=(CW-120-40)/3,th=92,ty=gyy+gh+30;
+  tiles.forEach(([k,v],i)=>{const x=60+(i%3)*(tw+20),y=ty+Math.floor(i/3)*(th+16);c.fillStyle='#1a1420';rrp(c,x,y,tw,th,16);c.fill();c.strokeStyle='rgba(255,220,170,.15)';c.lineWidth=2;c.stroke();
+    c.textAlign='left';c.font='600 18px Inter';c.fillStyle='#a89eb2';c.fillText(k,x+20,y+32);c.font='700 40px "Barlow Condensed"';c.fillStyle='#f2ece4';c.fillText(v,x+20,y+76)});
+  // bosses + relics
+  let ry=ty+2*(th+16)+44;c.textAlign='left';c.font='600 26px Inter';c.fillStyle='#ffd99a';
+  const bossTxt=run.bossesBeaten.length?'Slain: '+run.bossesBeaten.map(k=>BOSSES[k].ic+' '+BOSSES[k].name.replace(/^The /,'')).join('   '):'No bosses slain this time';c.fillText(bossTxt,60,ry);
+  ry+=50;c.font='38px Inter';const rel=(run.weapon?run.weapon.ic+' ':'')+run.relics.map(k=>RELICS[k].ic).join(' ');c.fillText(rel||'',60,ry);
+  c.textAlign='right';c.font='600 22px Inter';c.fillStyle='rgba(255,255,255,.45)';c.fillText('jakehobbick.github.io/crank-crypt',CW-60,CH-28);
+  return cv2;
+}
+async function saveShareCard(cv2){
+  const blob=await new Promise(r=>cv2.toBlob(r,'image/png'));if(!blob){toast('Could not make the image');return}
+  const name=`crank-crypt-${new Date(run.startedAt||Date.now()).toISOString().slice(0,10)}.png`;
+  try{const f=new File([blob],name,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Crank Crypt'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  if(dlCap){try{await dlCap.save({filename:name,data:blob});return}catch(e){}}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('Image saved')}catch(e){toast('Long-press the image to save it')}
+}
+async function copyText(t,btn){try{await navigator.clipboard.writeText(t);btn.textContent='Copied ✓'}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');btn.textContent='Copied ✓'}catch(e2){btn.textContent='Select & copy manually'}ta.remove()}}
 function endRun(won){
   if(state.screen==='end')return;
   clearSave();
@@ -2000,7 +2065,14 @@ function endRun(won){
    </div>
    <div class="goal" style="margin-top:12px">${(run.weapon?run.weapon.ic+' ':'')+run.relics.map(k=>RELICS[k].ic).join(' ')||'No relics this run.'}</div>
    <p class="hint">Career: ${car.runs} runs · ${car.wins} wins · ${Math.round(car.kj)} kJ · ${car.bosses.length}/${Object.keys(BOSSES).length} bosses slain</p>
-   <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="saveRide">⬇ Save ride for Garmin (.tcx)</button><button class="btn sec" id="againBtn">New run</button></div><p class="hint">Upload the file at connect.garmin.com → Import Data, or to Strava.</p>`);
+   <h4 class="achcat" style="margin-top:18px">Share</h4>
+   <img id="shareImg" alt="Share card" style="width:100%;border-radius:12px;border:1px solid var(--line);display:block;-webkit-user-select:auto;user-select:auto">
+   <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="saveCard">📸 Save share card</button><button class="btn sec sm" id="cpTitle">Copy title</button><button class="btn sec sm" id="cpDesc">Copy description</button></div>
+   <div class="goal" style="font-size:12.5px;white-space:pre-wrap;user-select:text;-webkit-user-select:text"><b id="shTitle"></b>
+<span id="shDesc"></span></div>
+   <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="saveRide">⬇ Save ride for Garmin (.tcx)</button><button class="btn sec" id="againBtn">New run</button></div><p class="hint">Upload the .tcx at connect.garmin.com → Import Data (it syncs on to Strava). Then add the card and paste the title on Strava.</p>`);
+  {const st={secs:S.length,avg,np,IF,tss,kj,avgHr};const cv2=makeShareCard(won,st);$('shareImg').src=cv2.toDataURL('image/png');const tx=shareText(won,st);$('shTitle').textContent=tx.title;$('shDesc').textContent=tx.desc;
+   $('saveCard').onclick=()=>saveShareCard(cv2);$('cpTitle').onclick=e=>copyText(tx.title,e.currentTarget);$('cpDesc').onclick=e=>copyText(tx.desc,e.currentTarget);}
   $('saveRide').onclick=()=>exportRide(run.samples,run.startedAt);
   $('againBtn').onclick=()=>{closeModal();run=null;setScreen('title');updateCareer()};
 }
@@ -2261,7 +2333,7 @@ function initUI(){
 }
 initUI();resize();requestAnimationFrame(loop);
 // test hook
-window.__cc={get run(){return run},get game(){return game},state,demo,enterNode,makeGame,startRoom,setScreen,sens,genMap,BOSSES,BossFight,bossWon,ACH_LIST,ACHS,achEvent,achScreen};
+window.__cc={get run(){return run},get game(){return game},state,demo,enterNode,makeGame,startRoom,setScreen,sens,genMap,BOSSES,BossFight,bossWon,endRun,makeShareCard,ACH_LIST,ACHS,achEvent,achScreen};
 </script>
 </body>
 </html>
