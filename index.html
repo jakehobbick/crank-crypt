@@ -999,6 +999,13 @@ function _drawHero(c,x,y,s,o={}){
     else if(wp==='axe'){c.strokeStyle='#5b3a1e';c.lineWidth=4*s;ln(c,...P2(-6,0),...P2(44,0));const ag=c.createLinearGradient(...P2(30,-14),...P2(30,4));ag.addColorStop(0,'#e5e7eb');ag.addColorStop(1,'#6b7280');c.fillStyle=ag;c.beginPath();c.moveTo(...P2(30,-2));c.quadraticCurveTo(...P2(26,-18),...P2(38,-20));c.quadraticCurveTo(...P2(46,-10),...P2(42,-2));c.closePath();c.fill()}
     else if(wp==='hammer'){c.strokeStyle='#5b3a1e';c.lineWidth=4*s;ln(c,...P2(-6,0),...P2(40,0));c.fillStyle='#71717a';c.beginPath();c.moveTo(...P2(34,-11));c.lineTo(...P2(48,-11));c.lineTo(...P2(48,11));c.lineTo(...P2(34,11));c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.moveTo(...P2(35,-10));c.lineTo(...P2(47,-10));c.lineTo(...P2(47,-7));c.lineTo(...P2(35,-7));c.closePath();c.fill()}
     else if(wp==='staff'){c.strokeStyle='#6b4a2a';c.lineWidth=3.6*s;ln(c,...P2(-14,0),...P2(46,0));const [ox,oy]=P2(50,0);c.fillStyle=o.eye||'#a78bfa';c.beginPath();c.arc(ox,oy,5.5*s,0,7);c.fill();c.fillStyle='rgba(255,255,255,.7)';c.beginPath();c.arc(ox-1.6*s,oy-1.6*s,1.6*s,0,7);c.fill();c.strokeStyle='#d4af37';c.lineWidth=1.6*s;c.beginPath();c.arc(ox,oy,7*s,0,7);c.stroke()}
+    else if(wp==='bow'){c.strokeStyle='#7c4a1e';c.lineWidth=3.4*s;c.beginPath();c.moveTo(...P2(16,-28));c.quadraticCurveTo(...P2(36,0),...P2(16,28));c.stroke();c.strokeStyle='#e5e7eb';c.lineWidth=1.1*s;c.beginPath();c.moveTo(...P2(16,-28));c.lineTo(...P2(4,0));c.lineTo(...P2(16,28));c.stroke();
+      c.strokeStyle='#a16207';c.lineWidth=2*s;ln(c,...P2(4,0),...P2(46,0));c.fillStyle='#cbd5e1';c.beginPath();c.moveTo(...P2(44,-4));c.lineTo(...P2(54,0));c.lineTo(...P2(44,4));c.fill();c.fillStyle=o.scarf||'#65a30d';c.beginPath();c.moveTo(...P2(4,0));c.lineTo(...P2(10,-4));c.lineTo(...P2(12,0));c.lineTo(...P2(10,4));c.fill()}
+    else if(wp==='daggers'){for(const [off,ang] of [[0,0],[8,.35]]){const q=(d,n)=>P2(d*Math.cos(ang)-n*Math.sin(ang),d*Math.sin(ang)+n*Math.cos(ang)+off);const bg=c.createLinearGradient(...q(6,0),...q(30,0));bg.addColorStop(0,'#f8fafc');bg.addColorStop(1,'#64748b');c.fillStyle=bg;c.beginPath();c.moveTo(...q(6,-3));c.lineTo(...q(32,0));c.lineTo(...q(6,3));c.fill();c.strokeStyle='#27272a';c.lineWidth=3*s;ln(c,...q(-4,0),...q(5,0));c.strokeStyle='#a1a1aa';c.lineWidth=2*s;ln(c,...q(5,-5),...q(5,5))}}
+    else if(wp==='scythe'){c.strokeStyle='#3f3f46';c.lineWidth=3.4*s;ln(c,...P2(-22,0),...P2(58,0));const sg=c.createLinearGradient(...P2(58,0),...P2(30,-34));sg.addColorStop(0,'#e5e7eb');sg.addColorStop(1,'#52525b');c.fillStyle=sg;c.beginPath();c.moveTo(...P2(58,-2));c.quadraticCurveTo(...P2(52,-30),...P2(22,-40));c.quadraticCurveTo(...P2(46,-24),...P2(54,3));c.closePath();c.fill();c.fillStyle='#84cc16';c.beginPath();c.arc(...P2(58,0),2.6*s,0,7);c.fill()}
+    else if(wp==='lute'){c.strokeStyle='#5b3a1e';c.lineWidth=3.6*s;ln(c,...P2(16,0),...P2(48,0));c.fillStyle='#5b3a1e';c.beginPath();c.moveTo(...P2(46,-3));c.lineTo(...P2(54,-6));c.lineTo(...P2(54,4));c.lineTo(...P2(46,3));c.fill();const [lx,ly]=P2(8,0);const lg=c.createRadialGradient(lx-3*s,ly-3*s,1,lx,ly,15*s);lg.addColorStop(0,'#f59e0b');lg.addColorStop(1,'#92400e');c.fillStyle=lg;c.beginPath();c.ellipse(lx,ly,15*s,11*s,a,0,7);c.fill();c.fillStyle='#3b2410';c.beginPath();c.arc(...P2(10,0),3.4*s,0,7);c.fill();c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=.7*s;ln(c,...P2(0,-1),...P2(52,-1));ln(c,...P2(0,1),...P2(52,1))}
+    else if(wp==='fists'){const [fx,fy]=P2(6,0);c.fillStyle='#78716c';c.beginPath();c.arc(fx,fy,9*s,0,7);c.fill();c.fillStyle='#d6d3d1';for(let k=-1;k<=1;k++){c.beginPath();c.arc(...P2(13,k*5),2.4*s,0,7);c.fill()}c.strokeStyle=o.scarf||'#f97316';c.lineWidth=2.4*s;c.beginPath();c.arc(fx,fy,13*s,0,7);c.stroke()}
+    else if(wp==='whip'){c.strokeStyle='#3b2410';c.lineWidth=4*s;ln(c,...P2(-4,0),...P2(10,0));c.strokeStyle='#78350f';c.lineWidth=2.2*s;c.beginPath();c.moveTo(...P2(10,0));for(let k=1;k<=12;k++){const d=10+k*6;c.lineTo(...P2(d,Math.sin(k*.9+ambT*8)*k*.9))}c.stroke()}
     else if(wp==='spear'){c.strokeStyle='#6b4a2a';c.lineWidth=3.2*s;ln(c,...P2(-18,0),...P2(52,0));c.fillStyle='#cbd5e1';c.beginPath();c.moveTo(...P2(50,-4));c.lineTo(...P2(66,0));c.lineTo(...P2(50,4));c.closePath();c.fill();c.fillStyle=o.scarf||'#e11d48';c.beginPath();c.moveTo(...P2(48,0));c.lineTo(...P2(42,-6));c.lineTo(...P2(42,6));c.closePath();c.fill()}
   }
   // ---- anime head ----
@@ -1350,7 +1357,8 @@ const ELEM={fire:{c:'#ff6b2c',d:'#5c1606',n:'Fire'},water:{c:'#38bdf8',d:'#0c2d4
   nature:{c:'#4ade80',d:'#0f3a1e',n:'Nature'},blood:{c:'#f43f5e',d:'#3f0612',n:'Blood'},star:{c:'#e879f9',d:'#3a0f40',n:'Star'},steel:{c:'#cbd5e1',d:'#252b36',n:'Steel'}};
 const HERO_ELEM={kai:'fire',rin:'wind',bram:'earth',sable:'shadow',mira:'nature',torvin:'steel',nami:'water',ash:'fire',luna:'star',grim:'shadow',zephyr:'wind',ember:'fire',tide:'water',
   thorn:'nature',sol:'light',vex:'blood',pip:'star',frost:'ice',volt:'bolt',champ:'light'};
-function heroElem(id){return ELEM[HERO_ELEM[id||(typeof settings!=='undefined'&&settings.hero)||'kai']||'fire']}
+function heroEK(id){id=id||settings.hero||'kai';const h=typeof HERO_BY_ID!=='undefined'&&HERO_BY_ID[id];return (h&&h.elem)||HERO_ELEM[id]||'fire'}
+function heroElem(id){return ELEM[heroEK(id)]}
 function elemSymbol(c,k,x,y,r,col){c.save();c.fillStyle=col;c.strokeStyle=col;c.lineWidth=r*.18;c.lineCap='round';c.lineJoin='round';c.beginPath();
   switch(k){
     case 'fire':c.moveTo(x,y-r);c.quadraticCurveTo(x+r*.9,y-r*.1,x+r*.5,y+r*.8);c.quadraticCurveTo(x,y+r*1.05,x-r*.5,y+r*.8);c.quadraticCurveTo(x-r*.8,y,x-r*.2,y-r*.35);c.quadraticCurveTo(x-r*.05,y-r*.1,x,y-r);c.fill();break;
@@ -1396,7 +1404,7 @@ function spellWave(c,x,y,s,t,col,k){
   for(let i=0;i<10;i++){const a=(hash(i*3.7)-.5)*1.6,r=(60+hash(i*9.1)*90)*s*(.6+k*.6);c.fillStyle=col;c.globalAlpha=.8*k;c.beginPath();c.arc(x+Math.cos(a)*r,y+Math.sin(a)*r,(2+hash(i)*4)*s,0,7);c.fill()}
   c.restore()}
 /* called by drawHero: behind = circle + book; front = spell wave */
-function grimHeroBack(c,x,y,s,o){const t=performance.now()/1000,E=heroElem(o.heroId),ek=HERO_ELEM[o.heroId||settings.hero||'kai']||'fire';
+function grimHeroBack(c,x,y,s,o){if(o.noBook)return;const t=performance.now()/1000,E=heroElem(o.heroId),ek=heroEK(o.heroId);
   const act=!!o.glow||(o.swing!=null&&Math.cos(o.swing)>.3);
   if(act)magicCircle(c,x,y+4*s,s,t,E.c,1);
   const bx=x-78*s,by=y-128*s+Math.sin(t*2.1)*6*s;
@@ -1609,7 +1617,7 @@ function hurt(n,x,y){
   if(!run||state.screen==='end')return 0;
   if(has('second_wind')&&!roomHitUsed){roomHitUsed=true;floatText(x??W/2,y??H*.4,'BLOCKED','#7dd3fc');return 0}
   roomHitUsed=true;
-  n=Math.round(n*(has('chain_mail')?.75:1)*(1-perk('armor')));if(n<=0)return 0;
+  n=Math.round(n*(has('chain_mail')?.75:1)*(1-perk('armor'))*(game instanceof BossFight?1-perk('bossArmor'):1));if(n<=0)return 0;
   run.hp-=n;shake=10;flash=1;sfx.hit();floatText(x??W*.3,y??H*.45,'-'+n+' HP','#ff6b6f');
   if(run.hp<=0){
     if(has('phoenix')&&!run.usedPhoenix){run.usedPhoenix=true;run.hp=Math.round(run.maxHp*.4);toast('🪶 Phoenix rises!');achInc('phoenix')}
@@ -1699,7 +1707,7 @@ function renderMap(){
 let game=null;
 function tgt(f){return f*run.mods.target}          // fraction of FTP after potion
 function bandAdj(lo,hi){const a=(has('aero_helm')?.03:0)+perk('band');return [tgt(lo)-a,tgt(hi)+a]}
-function dmgMult(){return run.mods.dmg*(has('whetstone')?1.2:1)*(1+(run.weapon?run.weapon.bonus:0))*(1+perk('dmg'))}
+function dmgMult(){return (perk('lowHp')&&run.hp<run.maxHp*.4?1+perk('lowHp'):1)*run.mods.dmg*(has('whetstone')?1.2:1)*(1+(run.weapon?run.weapon.bonus:0))*(1+perk('dmg'))}
 function sprintThr(f){return tgt(f)*(has('carbon_wheels')?.9:1)*(1-perk('sprint'))}
 function zoneCols(){return{bad:'rgba(229,72,77,.35)',ok:'rgba(74,222,128,.55)',meh:'rgba(245,196,81,.35)'}}
 
@@ -2910,26 +2918,26 @@ function achScreen(back){
    Heroes: 20 playable characters, perks, customization
    ========================================================= */
 const HEROES=[
- {id:'kai',name:'Kai',title:'the Crank Knight',ach:null,perkTxt:'Balanced. No special perk.',look:{hair:'#ff7a3d',hairStyle:'spiky',eye:'#2dd4bf',skin:'#ffe2c8',scarf:'#e11d48',tabard:'#7c3aed',cape:'#6d28d9',frame:'#c0392b',gear:'circlet',weapon:'sword'},perk:{}},
- {id:'rin',name:'Rin',title:'the Spinner',ach:'first_blood',perkTxt:'Cadence targets allow ±3 rpm more.',look:{hair:'#60a5fa',hairStyle:'long',eye:'#fbbf24',skin:'#fde7d3',scarf:'#facc15',tabard:'#0ea5e9',cape:'#1d4ed8',frame:'#14b8a6',gear:'catears',weapon:'staff'},perk:{tol:3}},
- {id:'bram',name:'Bram',title:'the Bulwark',ach:'elite1',perkTxt:'+15 max HP.',look:{hair:'#7c4a24',hairStyle:'bob',eye:'#65a30d',skin:'#e9b48a',scarf:'#78350f',tabard:'#475569',cape:'#334155',frame:'#57534e',gear:'horns',weapon:'axe'},perk:{hp:15}},
- {id:'sable',name:'Sable',title:'the Rogue',ach:'relic1',perkTxt:'+25% gold from all sources.',look:{hair:'#18181b',hairStyle:'bob',eye:'#22c55e',skin:'#f1d3bd',scarf:'#1f2937',tabard:'#14532d',cape:'#052e16',frame:'#27272a',gear:'hood',weapon:'sword'},perk:{gold:.25}},
- {id:'mira',name:'Mira',title:'the Alchemist',ach:'brew1',perkTxt:'Start with an Espresso Shot and a Tailwind Tonic.',look:{hair:'#f472b6',hairStyle:'pony',eye:'#a855f7',skin:'#ffe4d6',scarf:'#a21caf',tabard:'#7e22ce',cape:'#581c87',frame:'#db2777',gear:'witch',weapon:'staff'},perk:{potions:['espresso','tailwind']}},
- {id:'torvin',name:'Torvin',title:'the Smith',ach:'forge_iron',perkTxt:'Start with an Iron Blade (+10% damage).',look:{hair:'#b45309',hairStyle:'mohawk',eye:'#f59e0b',skin:'#d9a07a',scarf:'#92400e',tabard:'#78350f',cape:'#451a03',frame:'#a16207',gear:'goggles',weapon:'hammer'},perk:{weapon:{name:'Iron Blade',ic:'🗡️',bonus:.1}}},
- {id:'nami',name:'Nami',title:'the Angler',ach:'fish1',perkTxt:'Heal 3 HP after every room you win.',look:{hair:'#2dd4bf',hairStyle:'pony',eye:'#0ea5e9',skin:'#f6d2b8',scarf:'#0891b2',tabard:'#0e7490',cape:'#164e63',frame:'#06b6d4',gear:'bandana',weapon:'spear'},perk:{regen:3}},
- {id:'ash',name:'Ash',title:'the Phoenix',ach:'act1',perkTxt:'Start with the Phoenix Feather.',look:{hair:'#f97316',hairStyle:'spiky',eye:'#ef4444',skin:'#ffe0c2',scarf:'#fbbf24',tabard:'#b91c1c',cape:'#7f1d1d',frame:'#ea580c',gear:'crown',weapon:'sword'},perk:{relic:'phoenix'}},
- {id:'luna',name:'Luna',title:'the Moonrider',ach:'flawless1',perkTxt:'Campfire rests heal 50% more.',look:{hair:'#e5e7eb',hairStyle:'long',eye:'#818cf8',skin:'#fbe3d4',scarf:'#6366f1',tabard:'#312e81',cape:'#1e1b4b',frame:'#a5b4fc',gear:'circlet',weapon:'staff'},perk:{rest:.5}},
- {id:'grim',name:'Grim',title:'the Bonecaller',ach:'slay_lich',perkTxt:'Start with Second Wind (ignore first hit each room).',look:{hair:'#d4d4d8',hairStyle:'long',eye:'#a855f7',skin:'#e7e2dc',scarf:'#3f3f46',tabard:'#18181b',cape:'#09090b',frame:'#52525b',gear:'hood',weapon:'staff'},perk:{relic:'second_wind'}},
- {id:'zephyr',name:'Zephyr',title:'the Swift',ach:'pct150',perkTxt:'Sprint thresholds 5% lower.',look:{hair:'#f8fafc',hairStyle:'spiky',eye:'#38bdf8',skin:'#fde7d3',scarf:'#38bdf8',tabard:'#0284c7',cape:'#075985',frame:'#e2e8f0',gear:'goggles',weapon:'spear'},perk:{sprint:.05}},
- {id:'ember',name:'Ember',title:'the Fury',ach:'sprint100',perkTxt:'+10% damage in combat.',look:{hair:'#dc2626',hairStyle:'pony',eye:'#f97316',skin:'#f3c9a8',scarf:'#111827',tabard:'#991b1b',cape:'#450a0a',frame:'#b91c1c',gear:'horns',weapon:'axe'},perk:{dmg:.1}},
- {id:'tide',name:'Tide',title:'the Wavebreaker',ach:'slay_kraken',perkTxt:'Power bands are 2% FTP wider.',look:{hair:'#1d4ed8',hairStyle:'long',eye:'#22d3ee',skin:'#e8c4a6',scarf:'#06b6d4',tabard:'#1e3a8a',cape:'#172554',frame:'#0ea5e9',gear:'bandana',weapon:'spear'},perk:{band:.02}},
- {id:'thorn',name:'Thorn',title:'the Warden',ach:'elite10',perkTxt:'Take 10% less damage.',look:{hair:'#4d7c0f',hairStyle:'bob',eye:'#84cc16',skin:'#d8a77f',scarf:'#365314',tabard:'#3f6212',cape:'#1a2e05',frame:'#65a30d',gear:'hood',weapon:'axe'},perk:{armor:.1}},
- {id:'sol',name:'Sol',title:'the Radiant',ach:'conqueror',perkTxt:'Start with 50 extra gold.',look:{hair:'#fde047',hairStyle:'spiky',eye:'#f59e0b',skin:'#ffe8cc',scarf:'#f59e0b',tabard:'#ca8a04',cape:'#a16207',frame:'#eab308',gear:'crown',weapon:'sword'},perk:{startGold:50}},
- {id:'vex',name:'Vex',title:'the Duelist',ach:'boss_flawless',perkTxt:'+15% damage against bosses.',look:{hair:'#111827',hairStyle:'spiky',eye:'#e11d48',skin:'#f1cfb5',scarf:'#be123c',tabard:'#1f2937',cape:'#7f1d1d',frame:'#111827',gear:'bandana',weapon:'sword'},perk:{bossDmg:.15}},
- {id:'pip',name:'Pip',title:'the Lucky',ach:'shopaholic',perkTxt:'Shop prices 15% lower.',look:{hair:'#fb923c',hairStyle:'pony',eye:'#16a34a',skin:'#ffe4cf',scarf:'#16a34a',tabard:'#15803d',cape:'#14532d',frame:'#f97316',gear:'catears',weapon:'hammer'},perk:{shop:.15}},
- {id:'frost',name:'Frost',title:'the Glacial',ach:'hr1',perkTxt:'+10 max HP and take 5% less damage.',look:{hair:'#e0f2fe',hairStyle:'long',eye:'#7dd3fc',skin:'#f5e6dc',scarf:'#bae6fd',tabard:'#0c4a6e',cape:'#075985',frame:'#7dd3fc',gear:'crown',weapon:'spear'},perk:{hp:10,armor:.05}},
- {id:'volt',name:'Volt',title:'the Stormcaller',ach:'w600',perkTxt:'Sprint thresholds 8% lower.',look:{hair:'#facc15',hairStyle:'mohawk',eye:'#facc15',skin:'#f0c8a6',scarf:'#1e293b',tabard:'#334155',cape:'#0f172a',frame:'#fde047',gear:'goggles',weapon:'hammer'},perk:{sprint:.08}},
- {id:'champ',name:'Aurelia',title:'the Champion',ach:'all_bosses',perkTxt:'+10 max HP, +10% gold, +5% damage.',look:{hair:'#fef3c7',hairStyle:'long',eye:'#fbbf24',skin:'#ffe6d0',scarf:'#fbbf24',tabard:'#fef3c7',cape:'#b45309',frame:'#d4af37',gear:'crown',weapon:'sword'},perk:{hp:10,gold:.1,dmg:.05}},
+ {id:'kai',name:'Kai',title:'the Knight',cls:'Knight',elem:'steel',ach:null,perkTxt:'Take 5% less damage.',look:{hair:'#ff7a3d',hairStyle:'spiky',eye:'#2dd4bf',skin:'#ffe2c8',scarf:'#e11d48',tabard:'#1d4ed8',cape:'#1e3a8a',frame:'#c0392b',gear:'helm',weapon:'sword'},perk:{armor:.05}},
+ {id:'bram',name:'Bram',title:'the Barbarian',cls:'Barbarian',elem:'earth',ach:'elite1',perkTxt:'+10 max HP. +30% damage while below 40% HP.',look:{hair:'#7c4a24',hairStyle:'mohawk',eye:'#65a30d',skin:'#d9a07a',scarf:'#78350f',tabard:'#7c2d12',cape:'#431407',frame:'#57534e',gear:'horns',weapon:'axe'},perk:{hp:10,lowHp:.3}},
+ {id:'sable',name:'Sable',title:'the Rogue',cls:'Rogue',elem:'wind',ach:'first_blood',perkTxt:'+25% gold from all sources.',look:{hair:'#18181b',hairStyle:'bob',eye:'#22c55e',skin:'#f1d3bd',scarf:'#1f2937',tabard:'#14532d',cape:'#052e16',frame:'#27272a',gear:'hood',weapon:'daggers'},perk:{gold:.25}},
+ {id:'nami',name:'Nami',title:'the Ranger',cls:'Ranger',elem:'nature',ach:'fish1',perkTxt:'Power bands are 2% FTP wider.',look:{hair:'#a16207',hairStyle:'pony',eye:'#16a34a',skin:'#f6d2b8',scarf:'#65a30d',tabard:'#3f6212',cape:'#1a2e05',frame:'#4d7c0f',gear:'bandana',weapon:'bow'},perk:{band:.02}},
+ {id:'luna',name:'Luna',title:'the Paladin',cls:'Paladin',elem:'light',ach:'flawless1',perkTxt:'Heal 3 HP after every room you win.',look:{hair:'#fde68a',hairStyle:'long',eye:'#3b82f6',skin:'#fbe3d4',scarf:'#fbbf24',tabard:'#f8fafc',cape:'#1d4ed8',frame:'#d4af37',gear:'circlet',weapon:'hammer'},perk:{regen:3}},
+ {id:'grim',name:'Grim',title:'the Necromancer',cls:'Necromancer',elem:'shadow',ach:'slay_lich',perkTxt:'A bound skeleton takes the first hit in every room (Second Wind).',look:{hair:'#d4d4d8',hairStyle:'long',eye:'#84cc16',skin:'#e7e2dc',scarf:'#3f3f46',tabard:'#18181b',cape:'#09090b',frame:'#52525b',gear:'hood',weapon:'scythe'},perk:{relic:'second_wind'}},
+ {id:'mira',name:'Mira',title:'the Alchemist',cls:'Alchemist',elem:'star',ach:'brew1',perkTxt:'Start with an Espresso Shot and a Tailwind Tonic.',look:{hair:'#f472b6',hairStyle:'pony',eye:'#a855f7',skin:'#ffe4d6',scarf:'#a21caf',tabard:'#7e22ce',cape:'#581c87',frame:'#db2777',gear:'goggles',weapon:'staff'},perk:{potions:['espresso','tailwind']}},
+ {id:'ash',name:'Ash',title:'the Pyromancer',cls:'Pyromancer',elem:'fire',ach:'act1',perkTxt:'+10% damage in combat.',look:{hair:'#f97316',hairStyle:'spiky',eye:'#ef4444',skin:'#ffe0c2',scarf:'#fbbf24',tabard:'#b91c1c',cape:'#7f1d1d',frame:'#ea580c',gear:'witch',weapon:'staff'},perk:{dmg:.1}},
+ {id:'frost',name:'Frost',title:'the Cryomancer',cls:'Cryomancer',elem:'ice',ach:'slay_kraken',perkTxt:'Take 15% less damage in boss fights.',look:{hair:'#e0f2fe',hairStyle:'long',eye:'#7dd3fc',skin:'#f5e6dc',scarf:'#bae6fd',tabard:'#0c4a6e',cape:'#075985',frame:'#7dd3fc',gear:'circlet',weapon:'staff'},perk:{bossArmor:.15}},
+ {id:'volt',name:'Volt',title:'the Stormcaller',cls:'Stormcaller',elem:'bolt',ach:'w600',perkTxt:'Sprint thresholds 8% lower.',look:{hair:'#facc15',hairStyle:'mohawk',eye:'#facc15',skin:'#f0c8a6',scarf:'#1e293b',tabard:'#334155',cape:'#0f172a',frame:'#fde047',gear:'goggles',weapon:'spear'},perk:{sprint:.08}},
+ {id:'zephyr',name:'Zephyr',title:'the Monk',cls:'Monk',elem:'water',ach:'conqueror',perkTxt:'Cadence targets allow ±3 rpm more. +5 max HP.',look:{hair:'#18181b',hairStyle:'bob',eye:'#38bdf8',skin:'#e8c4a6',scarf:'#f97316',tabard:'#ea580c',cape:'#9a3412',frame:'#e2e8f0',gear:'none',weapon:'fists'},perk:{tol:3,hp:5}},
+ {id:'ember',name:'Ember',title:'the Berserker',cls:'Berserker',elem:'blood',ach:'sprint100',perkTxt:'+15% damage, but −10 max HP.',look:{hair:'#dc2626',hairStyle:'spiky',eye:'#f97316',skin:'#f3c9a8',scarf:'#111827',tabard:'#991b1b',cape:'#450a0a',frame:'#b91c1c',gear:'horns',weapon:'axe'},perk:{dmg:.15,hp:-10}},
+ {id:'sol',name:'Sol',title:'the Cleric',cls:'Cleric',elem:'light',ach:'hr1',perkTxt:'Campfire rests heal 50% more.',look:{hair:'#fde047',hairStyle:'bob',eye:'#f59e0b',skin:'#ffe8cc',scarf:'#f59e0b',tabard:'#fefce8',cape:'#a16207',frame:'#eab308',gear:'circlet',weapon:'hammer'},perk:{rest:.5}},
+ {id:'vex',name:'Vex',title:'the Warlock',cls:'Warlock',elem:'shadow',ach:'slay_demon',perkTxt:'+15% damage against bosses, −5 max HP.',look:{hair:'#111827',hairStyle:'long',eye:'#e11d48',skin:'#e9d5d5',scarf:'#be123c',tabard:'#1f2937',cape:'#4c0519',frame:'#111827',gear:'horns',weapon:'staff'},perk:{bossDmg:.15,hp:-5}},
+ {id:'pip',name:'Pip',title:'the Treasure Hunter',cls:'Treasure Hunter',elem:'star',ach:'relic1',perkTxt:'Start with 60 extra gold. +10% gold.',look:{hair:'#fb923c',hairStyle:'pony',eye:'#16a34a',skin:'#f0c8a6',scarf:'#b45309',tabard:'#a16207',cape:'#713f12',frame:'#f97316',gear:'bandana',weapon:'whip'},perk:{startGold:60,gold:.1}},
+ {id:'torvin',name:'Torvin',title:'the Blacksmith',cls:'Blacksmith',elem:'fire',ach:'forge_iron',perkTxt:'Start with an Iron Blade (+10% damage).',look:{hair:'#b45309',hairStyle:'mohawk',eye:'#f59e0b',skin:'#d9a07a',scarf:'#92400e',tabard:'#78350f',cape:'#451a03',frame:'#a16207',gear:'goggles',weapon:'hammer'},perk:{weapon:{name:'Iron Blade',ic:'🗡️',bonus:.1}}},
+ {id:'rin',name:'Rin',title:'the Bard',cls:'Bard',elem:'wind',ach:'shopaholic',perkTxt:'Shop prices 15% lower.',look:{hair:'#60a5fa',hairStyle:'pony',eye:'#fbbf24',skin:'#fde7d3',scarf:'#facc15',tabard:'#0ea5e9',cape:'#1d4ed8',frame:'#14b8a6',gear:'catears',weapon:'lute'},perk:{shop:.15}},
+ {id:'thorn',name:'Thorn',title:'the Druid',cls:'Druid',elem:'nature',ach:'elite10',perkTxt:'+10 max HP. Heal 2 HP after every room you win.',look:{hair:'#4d7c0f',hairStyle:'long',eye:'#84cc16',skin:'#d8a77f',scarf:'#365314',tabard:'#3f6212',cape:'#1a2e05',frame:'#65a30d',gear:'horns',weapon:'staff'},perk:{hp:10,regen:2}},
+ {id:'tide',name:'Nyx',title:'the Assassin',cls:'Assassin',elem:'blood',ach:'boss_flawless',perkTxt:'+8% damage and sprint thresholds 4% lower.',look:{hair:'#312e81',hairStyle:'bob',eye:'#f43f5e',skin:'#e8c4a6',scarf:'#111827',tabard:'#111827',cape:'#1e1b4b',frame:'#18181b',gear:'hood',weapon:'daggers'},perk:{dmg:.08,sprint:.04}},
+ {id:'champ',name:'Aurelia',title:'the Crypt Warden',cls:'Crypt Warden',elem:'light',ach:'all_bosses',perkTxt:'+10 max HP, +10% gold, +5% damage.',look:{hair:'#fef3c7',hairStyle:'long',eye:'#fbbf24',skin:'#ffe6d0',scarf:'#fbbf24',tabard:'#fef3c7',cape:'#b45309',frame:'#d4af37',gear:'helm',weapon:'sword'},perk:{hp:10,gold:.1,dmg:.05}},
 ];
 const HERO_BY_ID=Object.fromEntries(HEROES.map(h=>[h.id,h]));
 const heroUnlocked=h=>!h.ach||!!ACHS.unlocked[h.ach];
@@ -2938,7 +2946,7 @@ function heroLook(h){h=h||curHero();return {...h.look,...((settings.heroCustom||
 function perk(k){const p=curHero().perk||{};return p[k]||0}
 function applyHeroStart(){
   const p=curHero().perk||{};if(!run)return;
-  if(p.hp){run.maxHp+=p.hp;run.hp+=p.hp}
+  if(p.hp){run.maxHp=Math.max(30,run.maxHp+p.hp);run.hp=Math.min(run.maxHp,Math.max(1,run.hp+p.hp))}
   if(p.startGold)run.gold+=p.startGold;
   if(p.relic&&!run.relics.includes(p.relic))run.relics.push(p.relic);
   if(p.potions)p.potions.forEach(k=>addPotion(k));
@@ -2949,13 +2957,13 @@ const SWATCH={hair:['#ff7a3d','#fde047','#f8fafc','#18181b','#7c4a24','#dc2626',
   eye:['#2dd4bf','#38bdf8','#22c55e','#fbbf24','#ef4444','#a855f7','#7c4a24','#f472b6'],skin:['#ffe8cc','#ffe2c8','#f1cfb5','#e9b48a','#d9a07a','#b97d55','#8d5a3b','#5e3a26'],
   scarf:['#e11d48','#facc15','#16a34a','#0ea5e9','#7c3aed','#f8fafc','#111827','#f97316'],tabard:['#7c3aed','#b91c1c','#0e7490','#15803d','#ca8a04','#1f2937','#db2777','#475569'],
   frame:['#c0392b','#14b8a6','#eab308','#111827','#f8fafc','#2563eb','#db2777','#65a30d']};
-const STYLES={hairStyle:['spiky','long','pony','bob','mohawk'],gear:['circlet','none','hood','horns','catears','witch','crown','goggles','bandana','helm'],weapon:['sword','axe','hammer','staff','spear']};
+const STYLES={hairStyle:['spiky','long','pony','bob','mohawk'],gear:['circlet','none','hood','horns','catears','witch','crown','goggles','bandana','helm'],weapon:['sword','axe','hammer','staff','spear','bow','daggers','scythe','lute','fists','whip']};
 const LBL={hair:'Hair',eye:'Eyes',skin:'Skin',scarf:'Scarf',tabard:'Tabard',frame:'Bike',hairStyle:'Hair style',gear:'Headgear',weapon:'Weapon'};
 function heroPortrait(h,size=120,locked=false){
   const cv2=document.createElement('canvas'),d=Math.min(DPR||1,2);cv2.width=size*d;cv2.height=size*d;cv2.style.width=size+'px';cv2.style.height=size+'px';const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);
   const g=c.createRadialGradient(size/2,size*.45,4,size/2,size*.5,size*.7);g.addColorStop(0,locked?'#2a2430':'#3b2f4a');g.addColorStop(1,'#120e17');c.fillStyle=g;c.fillRect(0,0,size,size);
   const sv=heroHP;heroHP=false;
-  try{drawHero(c,size*.48,size*.88,size/170,{...heroLook(h),phase:1.2,swing:1.3})}finally{heroHP=sv}
+  try{drawHero(c,size*.48,size*.88,size/170,{...heroLook(h),phase:1.2,swing:1.3,noBook:true})}finally{heroHP=sv}
   if(locked){c.globalCompositeOperation='source-atop';c.fillStyle='rgba(8,6,10,.88)';c.fillRect(0,0,size,size);c.globalCompositeOperation='source-over';c.font=`${size*.26}px serif`;c.textAlign='center';c.fillText('🔒',size/2,size*.62)}
   return cv2;
 }
@@ -2968,7 +2976,7 @@ function heroScreen(){
         <div id="hBig" style="flex:none"></div>
         <div style="flex:1;min-width:220px">
           <div style="font-family:Cinzel,serif;font-size:22px;color:#ffd99a">${h.name} <span style="font-size:15px;color:var(--mut)">${h.title}</span></div>
-          <div class="goal" style="margin:8px 0">${un?'⭐ '+h.perkTxt+(typeof HERO_ELEM!=='undefined'?' &nbsp;·&nbsp; 📖 '+ELEM[HERO_ELEM[h.id]].n+' grimoire':''):`🔒 Unlock: <b>${ach?ach.ic+' '+ach.name:''}</b>: ${ach?ach.desc:''}`}</div>
+          <div class="goal" style="margin:8px 0">${un?'⭐ '+h.perkTxt+(typeof HERO_ELEM!=='undefined'?' &nbsp;·&nbsp; 📖 '+ELEM[heroEK(h.id)].n+' grimoire':''):`🔒 Unlock: <b>${ach?ach.ic+' '+ach.name:''}</b>: ${ach?ach.desc:''}`}</div>
           ${un?`<div id="hCustom"></div><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn" id="hSel">${settings.hero===h.id?'✓ Selected':'Play as '+h.name}</button><button class="btn sec sm" id="hReset">Reset look</button></div>`:''}
         </div>
       </div>
@@ -2977,7 +2985,7 @@ function heroScreen(){
     $('modalCard').style.width='min(820px,100%)';
     $('hBig').appendChild(heroPortrait(h,180,!un));
     const grid=$('hGrid');HEROES.forEach(hh=>{const u=heroUnlocked(hh);const b=document.createElement('button');b.className='hcard'+(hh.id===sel?' on':'')+(settings.hero===hh.id?' cur':'');
-      b.appendChild(heroPortrait(hh,84,!u));const l=document.createElement('div');l.textContent=u?hh.name:'???';b.appendChild(l);b.onclick=()=>{sel=hh.id;render()};grid.appendChild(b)});
+      b.appendChild(heroPortrait(hh,84,!u));const l=document.createElement('div');l.innerHTML=(u?hh.name:'???')+`<small style="display:block;opacity:.7;font-size:10px;line-height:1.1">${hh.cls||''}</small>`;b.appendChild(l);b.onclick=()=>{sel=hh.id;render()};grid.appendChild(b)});
     if(un){const box=$('hCustom');
       for(const k of ['hair','eye','skin','scarf','tabard','frame']){const row=document.createElement('div');row.className='hrow';row.innerHTML=`<span>${LBL[k]}</span>`;
         for(const col of SWATCH[k]){const sw=document.createElement('button');sw.className='sw'+(lk[k]===col?' on':'');sw.style.background=col;sw.onclick=()=>{setCustom(h.id,k,col);render()};row.appendChild(sw)}box.appendChild(row)}
