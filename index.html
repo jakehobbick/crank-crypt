@@ -214,7 +214,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
       You recover on the map at an easy ERG between rooms.
     </div></details>
 
-    <div style="display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap"><button class="btn sec" id="btnKeys">🎮 Controls</button><button class="btn sec" id="btnAch">🏆 Achievements</button><button class="btn sec" id="btnCont" style="display:none">▶ Continue run</button><button class="btn" id="btnStart" style="font-size:18px;padding:14px 34px">⚔️ Enter the Crypt</button></div>
+    <div style="display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap"><button class="btn sec" id="btnLast" style="display:none">⬇ Last ride</button><button class="btn sec" id="btnKeys">🎮 Controls</button><button class="btn sec" id="btnAch">🏆 Achievements</button><button class="btn sec" id="btnCont" style="display:none">▶ Continue run</button><button class="btn" id="btnStart" style="font-size:18px;padding:14px 34px">⚔️ Enter the Crypt</button></div>
     <div class="hint" id="careerTxt"></div>
   </div>
 </div>
@@ -248,6 +248,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
   <p class="msub">Room timers are frozen.</p>
   <div style="display:grid;gap:10px;margin-top:10px">
     <button class="btn" id="resumeBtn">Resume</button>
+    <button class="btn sec" id="pauseSave">⬇ Save ride so far (.tcx)</button>
     <button class="btn sec" id="abandonBtn">Abandon run</button>
   </div>
 </div></div>
@@ -947,7 +948,7 @@ const POTIONS={
 let run=null;
 function newRun(){
   run={hp:80,maxHp:80,gold:30,relics:[],weapon:null,act:0,bossesBeaten:[],bosses:BOSS_BY_ACT.map(a=>pick(a)),potions:['heal',null,null],slots:3,floor:-1,cur:null,map:null,roomsCleared:0,lastGame:null,usedPhoenix:false,
-    t0:performance.now(),samples:[],mods:{dmg:1,target:1},won:false,bossDone:false,log:[]};
+    t0:performance.now(),startedAt:Date.now(),samples:[],mods:{dmg:1,target:1},won:false,bossDone:false,log:[]};
   run.map=genMap(settings.floors);
 }
 const has=k=>run&&run.relics.includes(k);
@@ -1951,6 +1952,27 @@ function loadRun(){const o=LS.get('save',null);if(!o)return false;
   run.cur=o.cur==null?null:o.cur==='boss'?null:nodes[+o.cur.split('-')[0]][+o.cur.split('-')[1]];return true}
 function clearSave(){try{localStorage.removeItem('cc_save')}catch(e){}}
 
+/* --- ride file export (TCX for Garmin Connect / Strava) --- */
+function rideSpeed(P){let v=8;for(let i=0;i<20;i++){const f=0.5*1.2*0.32*v*v*v+75*9.81*0.004*v-Math.max(0,P);const d=1.5*1.2*0.32*v*v+75*9.81*0.004;v=Math.max(0,v-f/d)}return v}
+function buildTCX(S,start){
+  const iso=ms=>new Date(ms).toISOString().replace(/\.\d{3}Z$/,'Z');let dist=0,maxV=0,hrS=0,hrN=0,hrMax=0,cadS=0,cadN=0,kj=0;
+  const tp=S.map((x,i)=>{const t=x.t||start+i*1000;const v=x.p>0?rideSpeed(x.p):0;dist+=v;maxV=Math.max(maxV,v);kj+=x.p/1000;if(x.hr>0){hrS+=x.hr;hrN++;hrMax=Math.max(hrMax,x.hr)}if(x.c>0){cadS+=x.c;cadN++}
+    return `<Trackpoint><Time>${iso(t)}</Time><DistanceMeters>${dist.toFixed(1)}</DistanceMeters>${x.hr>0?`<HeartRateBpm><Value>${x.hr}</Value></HeartRateBpm>`:''}<Cadence>${Math.min(254,x.c|0)}</Cadence><Extensions><ns3:TPX><ns3:Speed>${v.toFixed(2)}</ns3:Speed><ns3:Watts>${x.p|0}</ns3:Watts></ns3:TPX></Extensions></Trackpoint>`}).join('');
+  const t0=S.length&&S[0].t?S[0].t:start,dur=S.length&&S[S.length-1].t?(S[S.length-1].t-t0)/1000+1:S.length;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2"><Activities><Activity Sport="Biking"><Id>${iso(t0)}</Id><Lap StartTime="${iso(t0)}"><TotalTimeSeconds>${Math.round(dur)}</TotalTimeSeconds><DistanceMeters>${dist.toFixed(1)}</DistanceMeters><MaximumSpeed>${maxV.toFixed(2)}</MaximumSpeed><Calories>${Math.round(kj)}</Calories>${hrN?`<AverageHeartRateBpm><Value>${Math.round(hrS/hrN)}</Value></AverageHeartRateBpm><MaximumHeartRateBpm><Value>${hrMax}</Value></MaximumHeartRateBpm>`:''}<Intensity>Active</Intensity>${cadN?`<Cadence>${Math.round(cadS/cadN)}</Cadence>`:''}<TriggerMethod>Manual</TriggerMethod><Track>${tp}</Track></Lap><Notes>Crank Crypt dungeon run</Notes><Creator xsi:type="Device_t" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><Name>Crank Crypt</Name><UnitId>0</UnitId><ProductID>0</ProductID></Creator></Activity></Activities></TrainingCenterDatabase>`}
+let dlCap=null;(async()=>{try{if(window.claude&&claude.use)dlCap=await claude.use('downloads')}catch(e){}})();
+async function exportRide(S,start){
+  if(!S||S.length<10){toast('Ride too short to save');return}
+  const xml=buildTCX(S,start||Date.now()-S.length*1000);const d=new Date(S[0].t||start||Date.now());
+  const name=`crank-crypt-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}.tcx`;
+  const blob=new Blob([xml],{type:'application/vnd.garmin.tcx+xml'});
+  try{const f=new File([blob],name,{type:'application/vnd.garmin.tcx+xml'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}}catch(e){if(e&&e.name==='AbortError')return}
+  if(dlCap){try{await dlCap.save({filename:name,data:xml});return}catch(e){}}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('Ride file saved')}catch(e){toast('Could not save the file here')}
+}
+function stashLastRide(){if(!run||!run.samples||run.samples.length<10)return;try{LS.set('lastRide',{start:run.startedAt||Date.now(),samples:run.samples.map(x=>[x.t||0,x.p,x.c,x.hr])})}catch(e){}}
+function lastRide(){const r=LS.get('lastRide',null);if(!r)return null;return {start:r.start,samples:r.samples.map(a=>({t:a[0]||0,p:a[1],c:a[2],hr:a[3]}))}}
 function endRun(won){
   if(state.screen==='end')return;
   clearSave();
@@ -1960,7 +1982,7 @@ function endRun(won){
   const IF=np/F(),tss=S.length*np*IF/(F()*3600)*100,kj=S.reduce((a,b)=>a+b.p,0)/1000;
   const hrs=S.filter(s=>s.hr>0),avgHr=hrs.length?hrs.reduce((a,b)=>a+b.hr,0)/hrs.length:0;
   const car=LS.get('career',{runs:0,wins:0,kj:0,bosses:[]});car.runs++;if(won)car.wins++;car.kj+=kj;car.bosses=[...new Set([...(car.bosses||[]),...run.bossesBeaten])];LS.set('career',car);
-  achEvent('runEnd',{won,depth:settings.floors,IF,tss,kj});
+  achEvent('runEnd',{won,depth:settings.floors,IF,tss,kj});stashLastRide();
   won?sfx.win():sfx.lose();
   const where=run.cur==='boss'?`against ${BOSSES[run.bosses[run.act]].name}`:`on floor ${run.cur?run.cur.r+1:1} of Act ${ACTS[run.act].roman}`;
   modal(`<div class="mh"><span class="ic">${won?'👑':'☠️'}</span>${won?'The Depths are Conquered':'Fallen in the Depths'}</div>
@@ -1978,7 +2000,8 @@ function endRun(won){
    </div>
    <div class="goal" style="margin-top:12px">${(run.weapon?run.weapon.ic+' ':'')+run.relics.map(k=>RELICS[k].ic).join(' ')||'No relics this run.'}</div>
    <p class="hint">Career: ${car.runs} runs · ${car.wins} wins · ${Math.round(car.kj)} kJ · ${car.bosses.length}/${Object.keys(BOSSES).length} bosses slain</p>
-   <div style="margin-top:14px;display:flex;gap:10px"><button class="btn" id="againBtn">New run</button></div>`);
+   <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="saveRide">⬇ Save ride for Garmin (.tcx)</button><button class="btn sec" id="againBtn">New run</button></div><p class="hint">Upload the file at connect.garmin.com → Import Data, or to Strava.</p>`);
+  $('saveRide').onclick=()=>exportRide(run.samples,run.startedAt);
   $('againBtn').onclick=()=>{closeModal();run=null;setScreen('title');updateCareer()};
 }
 
@@ -2152,7 +2175,7 @@ function loop(now){
   const P=sens.power,cad=sens.cad;
   heroPhase+=(cad>0?cad:0)/60*Math.PI*2*dt;
   if(run&&!state.paused&&state.screen!=='title'&&state.screen!=='end'){
-    sampleAcc+=dt;while(sampleAcc>=1){sampleAcc-=1;run.samples.push({p:Math.round(sens.power),c:Math.round(sens.cad),hr:sens.hr});achEvent('tick')}
+    sampleAcc+=dt;while(sampleAcc>=1){sampleAcc-=1;run.samples.push({t:Date.now(),p:Math.round(sens.power),c:Math.round(sens.cad),hr:sens.hr});achEvent('tick')}
   }
   ctx.save();if(shake>0)ctx.translate(rnd(-shake,shake),rnd(-shake,shake));
   if(state.screen==='room'&&game){
@@ -2189,7 +2212,7 @@ function keysScreen(){
     $('kDone').onclick=()=>{keyCapture=null;closeModal()};
     $('kReset').onclick=()=>{settings.keys={shiftUp:'e',shiftDown:'q',confirm:'Enter',next:'d',prev:'a',potion:'f',pause:'Escape'};LS.set('settings',settings);render()}};
   render()}
-function updateCareer(){const c=LS.get('career',null);$('careerTxt').textContent=c?`Career: ${c.runs} runs · ${c.wins} wins · ${Math.round(c.kj)} kJ · ${(c.bosses||[]).length}/12 bosses slain`:'';$('btnAch').textContent=`🏆 Achievements ${Object.keys(ACHS.unlocked).length}/${ACH_LIST.length}`;const sv=LS.get('save',null);$('btnCont').style.display=sv?'':'none';if(sv)$('btnCont').textContent=`▶ Continue (Act ${ACTS[sv.act].roman}, ${sv.hp} HP)`}
+function updateCareer(){if($('btnLast'))$('btnLast').style.display=LS.get('lastRide',null)?'':'none';const c=LS.get('career',null);$('careerTxt').textContent=c?`Career: ${c.runs} runs · ${c.wins} wins · ${Math.round(c.kj)} kJ · ${(c.bosses||[]).length}/12 bosses slain`:'';$('btnAch').textContent=`🏆 Achievements ${Object.keys(ACHS.unlocked).length}/${ACH_LIST.length}`;const sv=LS.get('save',null);$('btnCont').style.display=sv?'':'none';if(sv)$('btnCont').textContent=`▶ Continue (Act ${ACTS[sv.act].roman}, ${sv.hp} HP)`}
 function initUI(){
   $('inFtp').value=settings.ftp;$('inDiff').value=String(settings.diff);
   $('inFtp').onchange=()=>{settings.ftp=clamp(+$('inFtp').value||200,80,600);$('inFtp').value=settings.ftp;LS.set('settings',settings)};
@@ -2230,6 +2253,8 @@ function initUI(){
   addEventListener('keyup',e=>{if(e.key===' ')demo.sprint=false});
   for(const [id,d] of [['gUp',1],['gDown',-1]]){$(id).addEventListener('pointerdown',e=>{e.preventDefault();shift(d)})}
   $('btnKeys').onclick=()=>keysScreen();
+  $('pauseSave').onclick=()=>{if(run)exportRide(run.samples,run.startedAt)};
+  $('btnLast').onclick=()=>{const r=lastRide();if(r)exportRide(r.samples,r.start)};
   $('btnAch').onclick=()=>achScreen();$('mapAch').onclick=()=>achScreen();
   $('btnCont').onclick=()=>{audioInit();if(loadRun()){demo.watts=Math.round(F()*.55);setScreen('map');refreshTop();renderMap();setTrainer({mode:'erg',w:.55})}};
   btSupportNote();updateCareer();
