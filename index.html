@@ -138,6 +138,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
 .achp{height:5px;background:#2a2133;border-radius:3px;margin-top:5px;overflow:hidden}.achp i{display:block;height:100%;background:#f5c451}
 #achPop{position:fixed;right:12px;top:calc(var(--topH,56px) + 10px);z-index:50;display:flex;gap:12px;align-items:center;background:linear-gradient(180deg,#3a2a14,#1f160c);border:1px solid rgba(245,196,81,.7);border-radius:14px;padding:10px 16px;box-shadow:0 10px 40px rgba(0,0,0,.6),0 0 24px rgba(245,196,81,.25);transform:translateX(130%);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);max-width:min(360px,92vw);pointer-events:none}
 #achPop.on{transform:translateX(0)}#achPop .aic{font-size:32px}#achPop small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#f5c451}#achPop b{display:block;font-family:Cinzel,serif;font-size:16px}#achPop span{font-size:12px;color:#d8cfe0}
+#gearBox{position:fixed;right:10px;bottom:calc(var(--demoH,0px) + 12px);z-index:13;display:none;align-items:center;gap:6px;background:rgba(22,17,28,.92);border:1px solid var(--line);border-radius:14px;padding:6px}
+#gearBox.on{display:flex}.gbtn{width:46px;height:46px;border-radius:10px;background:#2d2438;border:1px solid var(--line);font-size:24px;font-weight:700}
+.gmid{text-align:center;min-width:64px}.gmid small{display:block;font-size:10px;letter-spacing:.14em;color:var(--mut)}.gmid b{font-size:26px;line-height:1}.gmid em{display:block;font-size:10px;color:var(--gold);font-style:normal}
+.node.sel circle.bg{stroke:#fff;stroke-width:4}
+.keyrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.keyrow span{flex:1}.keyrow kbd{background:#2d2438;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-family:inherit;min-width:70px;text-align:center}
 @media (pointer:coarse){.btn{min-height:48px;font-size:17px}.btn.sm{min-height:40px}.iconbtn{width:44px;height:44px;font-size:18px}.pot{width:42px;height:42px;font-size:22px}.choice{padding:14px 16px;min-height:60px}.field input,.field select{min-height:46px}#sprintBtn{min-height:48px}#demo .btn.sm{min-width:44px}}
 @media (max-width:640px){#demo{flex-wrap:nowrap;gap:5px;padding:6px}#demo .grp{padding:4px 5px;gap:4px}#demo .grp b,#sprintBtn .lg{display:none}#demo .grp .num{min-width:34px;font-size:18px}#demo .btn.sm{padding:6px 10px}#sprintBtn{padding:9px 10px;font-size:13px}.relics{display:none}.hpbar{width:100px}.live .v{font-size:22px}#rhName{display:none}}
 </style>
@@ -205,7 +210,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
       You recover on the map at an easy ERG between rooms.
     </div></details>
 
-    <div style="display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap"><button class="btn sec" id="btnAch">🏆 Achievements</button><button class="btn sec" id="btnCont" style="display:none">▶ Continue run</button><button class="btn" id="btnStart" style="font-size:18px;padding:14px 34px">⚔️ Enter the Crypt</button></div>
+    <div style="display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap"><button class="btn sec" id="btnKeys">🎮 Controls</button><button class="btn sec" id="btnAch">🏆 Achievements</button><button class="btn sec" id="btnCont" style="display:none">▶ Continue run</button><button class="btn" id="btnStart" style="font-size:18px;padding:14px 34px">⚔️ Enter the Crypt</button></div>
     <div class="hint" id="careerTxt"></div>
   </div>
 </div>
@@ -230,6 +235,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
   <div class="grp"><b>RPM</b><button class="btn sm sec" data-c="-5">−</button><span class="num" id="dmC">85</span><button class="btn sm sec" data-c="5">+</button></div>
 </div>
 
+<div id="gearBox"><button class="gbtn" id="gDown">−</button><div class="gmid"><small>GEAR</small><b class="num" id="gearNum">6</b><em id="gearW"></em></div><button class="gbtn" id="gUp">+</button></div>
 <div id="toast"></div>
 <div id="achPop"></div>
 
@@ -257,7 +263,7 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 const fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 const LS={get(k,d){try{const v=localStorage.getItem('cc_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('cc_'+k,JSON.stringify(v))}catch(e){}}};
 
-const settings=Object.assign({ftp:200,diff:0.75,floors:6,gears:'yes',feel:0.8},LS.get('settings',{}));if(![4,6,8].includes(settings.floors))settings.floors=6;
+const settings=Object.assign({ftp:200,diff:0.75,floors:6,gears:'yes',feel:0.8,gear:6,keys:{shiftUp:'e',shiftDown:'q',confirm:'Enter',next:'d',prev:'a',potion:'f',pause:'Escape'}},LS.get('settings',{}));if(![4,6,8].includes(settings.floors))settings.floors=6;settings.keys=Object.assign({shiftUp:'e',shiftDown:'q',confirm:'Enter',next:'d',prev:'a',potion:'f',pause:'Escape'},settings.keys||{});if(!settings.gear)settings.gear=6;
 const F=()=>settings.ftp;
 
 /* =========================================================
@@ -288,7 +294,7 @@ const crankPrev={revs:null,time:null,lastChange:0};
 function btSupportNote(){
   let msg='';
   if(!navigator.bluetooth){msg='Bluetooth isn\'t available in this browser. Use Chrome on a laptop or Android. On iPhone/iPad, open this page in the free <b>Bluefy</b> browser. Until then you can play with the on-screen controls (↑/↓ watts, ←/→ cadence, hold Space to sprint).'}
-  else msg=settings.gears==='no'?'No-gears mode: in non-ERG rooms the trainer acts like one fixed gear, so spin faster for more power and slower for less. The power bar shows the rpm for each power level.':'Use the gears on your bike in SIM rooms. In ERG rooms the trainer sets the watts, so just hold your cadence.';
+  else msg=settings.gears==='no'?'No-gears mode: the game gives you 12 virtual gears (on-screen + / − buttons, or your Zwift Ride buttons through BikeControl, see 🎮 Controls). Shift up for more power at the same cadence. The power bar shows the rpm for each power level in your current gear.':'Use the gears on your bike in SIM rooms. In ERG rooms the trainer sets the watts, so just hold your cadence.';
   $('btNote').innerHTML=msg;
 }
 function cpWrite(bytes){
@@ -378,7 +384,12 @@ function parseCPS(dv){
 let trainerTarget={mode:'erg',w:0.55};
 function setTrainer(t){trainerTarget=t;applyTrainer(true);updatePill()}
 const fgOn=()=>settings.gears==='no'&&trainerTarget.mode==='sim';
-function fgCenter(g){return settings.feel*(1+0.06*((g??2)*settings.diff-1.5))}
+const GEARS=12;const gearFactor=()=>Math.pow(1.09,(settings.gear||6)-6);
+function fgCenter(g){return settings.feel*gearFactor()*(1+0.06*((g??2)*settings.diff-1.5))}
+function shift(d){if(settings.gears!=='no')return;const ng=clamp((settings.gear||6)+d,1,GEARS);if(ng===settings.gear)return;settings.gear=ng;LS.set('settings',settings);
+  tone(d>0?1400:900,.05,.06,'square');applyTrainer(true);updatePill();updateGearUI()}
+function updateGearUI(){const on=settings.gears==='no'&&state.screen!=='title'&&state.screen!=='end';$('gearBox').classList.toggle('on',on);$('gearNum').textContent=settings.gear;
+  $('gearW').textContent='90rpm≈'+Math.round(fgCenter(trainerTarget.mode==='sim'?trainerTarget.g:2)*F())+'W'}
 function fixedGearW(cad,g){return clamp(fgCenter(g)*F()*Math.pow(Math.max(0,cad)/90,3),40,2.6*F())}
 function rpmFor(W,g){return 90*Math.cbrt(W/(fgCenter(g)*F()))}
 function applyTrainer(force){
@@ -402,7 +413,7 @@ function applyTrainer(force){
 }
 function updatePill(){const p=$('modePill');const t=trainerTarget;
   if(t.mode==='erg'){p.className='mode-pill erg';p.textContent='ERG '+Math.round(t.w*F())+'W'}
-  else if(settings.gears==='no'){p.className='mode-pill sim';p.textContent='FIXED GEAR · 90rpm≈'+Math.round(fgCenter(t.g)*F())+'W'}
+  else if(settings.gears==='no'){p.className='mode-pill sim';p.textContent='GEAR '+settings.gear+'/'+GEARS+' · 90rpm≈'+Math.round(fgCenter(t.g)*F())+'W'}
   else{p.className='mode-pill sim';p.textContent='SIM '+(t.g*settings.diff).toFixed(1)+'%'}}
 function readSensors(dt){
   const now=performance.now();
@@ -420,7 +431,7 @@ function readSensors(dt){
   sens.smooth+=(sens.power-sens.smooth)*(1-Math.exp(-dt/1.4));
   sens.cadSm+=(sens.cad-sens.cadSm)*(1-Math.exp(-dt/0.8));
 }
-function updateDemoVis(){const on=sens.src==='demo'&&state.screen!=='title'&&state.screen!=='end';$('demo').classList.toggle('on',on);demoH=on?$('demo').offsetHeight:0;$('map').classList.toggle('demo',on);$('dmW').textContent=Math.round(demo.watts);$('dmC').textContent=Math.round(demo.cad)}
+function updateDemoVis(){const on=sens.src==='demo'&&state.screen!=='title'&&state.screen!=='end';$('demo').classList.toggle('on',on);demoH=on?$('demo').offsetHeight:0;document.documentElement.style.setProperty('--demoH',demoH+'px');if(typeof updateGearUI==='function')updateGearUI();$('map').classList.toggle('demo',on);$('dmW').textContent=Math.round(demo.watts);$('dmC').textContent=Math.round(demo.cad)}
 
 /* =========================================================
    Canvas setup
@@ -1004,6 +1015,7 @@ function availableNodes(){
   if(run.cur.r===m.rows-1)return [m.boss];
   return [...run.cur.next].map(c=>m.nodes[run.cur.r+1][c]);
 }
+let mapSel=0;
 function renderMap(){
   const m=run.map,svg=$('mapSvg');const cw=Math.min(W-20,matchMedia('(pointer:coarse)').matches?560:460),rowH=matchMedia('(pointer:coarse)').matches?96:86,top=70,h=top+rowH*(m.rows)+40;
   const colW=(cw-60)/(m.cols-1);
@@ -1016,7 +1028,7 @@ function renderMap(){
       s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${walked?'#ffb35a':'#4a3d57'}" stroke-width="${walked?3:2}" stroke-dasharray="${walked?'':'5 6'}" stroke-linecap="round"/>`}}
   const all=[...m.nodes.flat().filter(Boolean),m.boss];
   for(const n of all){const [x,y]=P(n);const touch=matchMedia('(pointer:coarse)').matches;const r=n.type==='boss'?(touch?34:30):(touch?25:20);
-    const cls=['node',avail.has(n)?'avail':'',n.done?'done':'',n===run.cur?'cur':''].join(' ');
+    const avArr=[...avail];const cls=['node',avail.has(n)?'avail':'',n.done?'done':'',n===run.cur?'cur':'',avArr[mapSel%Math.max(1,avArr.length)]===n?'sel':''].join(' ');
     s+=`<g class="${cls}" data-id="${n.type==='boss'?'boss':n.r+'-'+n.c}">${avail.has(n)?`<circle class="pulse" cx="${x}" cy="${y}" r="${r+4}" fill="#ffb35a"/>`:''}<circle class="bg" cx="${x}" cy="${y}" r="${r}"/><text x="${x}" y="${y+1}" text-anchor="middle" dominant-baseline="central" font-size="${n.type==='boss'?30:19}" opacity="${n.done?.45:1}">${n.type==='boss'?BOSSES[run.bosses[run.act]].ic:ICON[n.type]}</text></g>`}
   svg.setAttribute('width',cw);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${cw} ${h}`);svg.innerHTML=s;
   svg.querySelectorAll('.node.avail').forEach(g=>g.onclick=()=>{const id=g.dataset.id;const n=id==='boss'?m.boss:m.nodes[+id.split('-')[0]][+id.split('-')[1]];enterNode(n)});
@@ -1779,7 +1791,7 @@ function show(id,on=true){$(id).classList.toggle('on',on)}
 function setScreen(s){state.screen=s;
   show('title',s==='title');show('map',s==='map');show('roomHud',s==='room');show('top',s!=='title');
   if(s!=='modal'&&s!=='room')show('modal',false);
-  resize();updateDemoVis();}
+  resize();updateDemoVis();updateGearUI();}
 function toast(msg){const d=document.createElement('div');d.className='toastMsg';d.textContent=msg;$('toast').innerHTML='';$('toast').appendChild(d)}
 function modal(html){show('modal',true);$('modalCard').innerHTML=html;$('modalCard').scrollTop=0}
 function closeModal(){show('modal',false)}
@@ -1808,7 +1820,7 @@ function miniGame(n){
   else startRoom(makeGame(k,n.r));
 }
 function intro(room){
-  const g=room.g;const tr=g.trainer;const mode=tr.mode==='erg'?`ERG · ${Math.round(tr.w*F())} W`:settings.gears==='no'?`Fixed gear · 90 rpm ≈ ${Math.round(fgCenter(tr.g)*F())} W, 110 rpm ≈ ${Math.round(fixedGearW(110,tr.g))} W`:`SIM · ${(tr.g*settings.diff).toFixed(1)}% grade`;
+  const g=room.g;const tr=g.trainer;const mode=tr.mode==='erg'?`ERG · ${Math.round(tr.w*F())} W`:settings.gears==='no'?`Gear ${settings.gear} · 90 rpm ≈ ${Math.round(fgCenter(tr.g)*F())} W (shift for more)`:`SIM · ${(tr.g*settings.diff).toFixed(1)}% grade`;
   let secs=10;const B=room.boss?BOSSES[g.key]:null;
   modal(`<div class="mh"><span class="ic">${room.ic}</span>${room.name}${room.elite?' <span class="chip" style="background:#5a1d2a;color:#ffb4b4">ELITE</span>':''}${room.boss?' <span class="chip" style="background:#3b1d5a;color:#d8b4fe">ACT '+ACTS[run.act].roman+' BOSS</span>':''}${room.mini?' <span class="chip">MINI-GAME</span>':''}</div>
     ${B?`<div class="goal">${B.phases.map((p,i)=>`<b>${i+1}. ${p.name}</b> · ${({band:'hold a power band',sprint:'sprint waves',tug:'tug-of-war',follow:'follow the ribbon',cadence:'cadence runes (ERG)',ramp:'outlast its charge'})[p.k]}`).join('<br>')}<br><span class="mut">If it's still standing after phase 3, you sprint until it falls.</span></div>`:`<div class="goal">${g.objective}</div>`}
@@ -2155,6 +2167,24 @@ function loop(now){
 /* =========================================================
    Wiring
    ========================================================= */
+let keyCapture=null,choiceSel=-1;
+function visibleChoices(){if($('pause').classList.contains('on'))return [...document.querySelectorAll('#pause .btn')];if(!$('modal').classList.contains('on'))return [];return [...$('modalCard').querySelectorAll('button.choice:not(:disabled),button.btn')].filter(b=>b.offsetParent!==null)}
+function cycleChoice(d){const L=visibleChoices();if(!L.length)return;L.forEach(b=>b.style.outline='');choiceSel=(choiceSel+d+L.length)%L.length;L[choiceSel].style.outline='3px solid #fff';L[choiceSel].scrollIntoView({block:'nearest'})}
+function doConfirm(){
+  if($('pause').classList.contains('on')){$('resumeBtn').click();return}
+  if(state.screen==='title'){$('btnStart').click();return}
+  if(state.screen==='map'&&run&&!$('modal').classList.contains('on')){const av=availableNodes();if(av.length){const n=av[((mapSel%av.length)+av.length)%av.length];mapSel=0;enterNode(n)}return}
+  const L=visibleChoices();if(!L.length)return;const sel=L.find(b=>b.style.outline);(sel||L.find(b=>b.classList.contains('btn')&&!b.classList.contains('sec'))||L[0]).click();choiceSel=-1}
+const KEYLBL={shiftUp:'Shift up (harder gear)',shiftDown:'Shift down (easier gear)',confirm:'Confirm / Start / Onward',next:'Next path or option',prev:'Previous path or option',potion:'Use first potion',pause:'Pause'};
+function keysScreen(){
+  const render=()=>{modal(`<div class="mh"><span class="ic">🎮</span>Controls</div><p class="msub">Map your Zwift Ride buttons here. In BikeControl, set each button to send the key shown. Tap <b>Change</b>, then press the button (or key) you want.</p>
+    ${Object.entries(KEYLBL).map(([a,l])=>`<div class="keyrow"><span>${l}</span><kbd>${settings.keys[a]===' '?'Space':settings.keys[a]}</kbd><button class="btn sec sm" data-k="${a}">Change</button></div>`).join('')}
+    <p class="note" style="margin-top:10px">Defaults: E / Q shift, Enter confirms, A / D pick paths, F drinks a potion, Esc pauses. The on-screen gear buttons always work too.</p>
+    <div style="margin-top:14px;display:flex;gap:10px"><button class="btn" id="kDone">Done</button><button class="btn sec sm" id="kReset">Reset defaults</button></div>`);
+    document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{b.textContent='Press a key…';keyCapture=k=>{keyCapture=null;settings.keys[b.dataset.k]=k;LS.set('settings',settings);render()}});
+    $('kDone').onclick=()=>{keyCapture=null;closeModal()};
+    $('kReset').onclick=()=>{settings.keys={shiftUp:'e',shiftDown:'q',confirm:'Enter',next:'d',prev:'a',potion:'f',pause:'Escape'};LS.set('settings',settings);render()}};
+  render()}
 function updateCareer(){const c=LS.get('career',null);$('careerTxt').textContent=c?`Career: ${c.runs} runs · ${c.wins} wins · ${Math.round(c.kj)} kJ · ${(c.bosses||[]).length}/12 bosses slain`:'';$('btnAch').textContent=`🏆 Achievements ${Object.keys(ACHS.unlocked).length}/${ACH_LIST.length}`;const sv=LS.get('save',null);$('btnCont').style.display=sv?'':'none';if(sv)$('btnCont').textContent=`▶ Continue (Act ${ACTS[sv.act].roman}, ${sv.hp} HP)`}
 function initUI(){
   $('inFtp').value=settings.ftp;$('inDiff').value=String(settings.diff);
@@ -2177,7 +2207,16 @@ function initUI(){
   document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{demo.cad=clamp(demo.cad+(+b.dataset.c),0,160)});
   const sb=$('sprintBtn');const on=e=>{e.preventDefault();demo.sprint=true},off=()=>{demo.sprint=false};
   sb.addEventListener('pointerdown',on);sb.addEventListener('pointerup',off);sb.addEventListener('pointerleave',off);sb.addEventListener('pointercancel',off);
-  addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const st=e.shiftKey?25:10;
+  addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;
+    if(keyCapture){e.preventDefault();keyCapture(e.key);return}
+    const K=settings.keys,k=e.key,eq=b=>b&&k.toLowerCase()===b.toLowerCase();
+    if(eq(K.shiftUp)){shift(1);e.preventDefault();return}
+    if(eq(K.shiftDown)){shift(-1);e.preventDefault();return}
+    if(eq(K.confirm)){doConfirm();e.preventDefault();return}
+    if(eq(K.next)||eq(K.prev)){if(state.screen==='map'&&run){mapSel+=eq(K.next)?1:-1+availableNodes().length;renderMap()}else cycleChoice(eq(K.next)?1:-1);e.preventDefault();return}
+    if(eq(K.potion)){if(run){const i=run.potions.findIndex(Boolean);if(i>=0)usePotion(i)}e.preventDefault();return}
+    if(eq(K.pause)&&state.screen!=='title'){state.paused=!state.paused;show('pause',state.paused);e.preventDefault();return}
+    const st=e.shiftKey?25:10;
     if(e.key==='ArrowUp'){demo.watts=clamp(demo.watts+st,0,1500);e.preventDefault()}
     else if(e.key==='ArrowDown'){demo.watts=clamp(demo.watts-st,0,1500);e.preventDefault()}
     else if(e.key==='ArrowRight'){demo.cad=clamp(demo.cad+5,0,160);e.preventDefault()}
@@ -2185,6 +2224,8 @@ function initUI(){
     else if(e.key===' '){demo.sprint=true;e.preventDefault()}
     else if(e.key==='Escape'||e.key==='p'){if(state.screen!=='title'){state.paused=!state.paused;show('pause',state.paused)}}});
   addEventListener('keyup',e=>{if(e.key===' ')demo.sprint=false});
+  $('gUp').onclick=()=>shift(1);$('gDown').onclick=()=>shift(-1);
+  $('btnKeys').onclick=()=>keysScreen();
   $('btnAch').onclick=()=>achScreen();$('mapAch').onclick=()=>achScreen();
   $('btnCont').onclick=()=>{audioInit();if(loadRun()){demo.watts=Math.round(F()*.55);setScreen('map');refreshTop();renderMap();setTrainer({mode:'erg',w:.55})}};
   btSupportNote();updateCareer();
