@@ -213,8 +213,110 @@
    "scale": 1.05
   },
   "goblin": {
-   "file": "art/enemies/goblin.webp",
-   "scale": 1.05
+   "file": "art/enemies/goblin_archer.webp",
+   "scale": 1.1
+  },
+  "skeleton_elite": {
+   "file": "art/enemies/skeleton_elite.webp",
+   "scale": 1.1
+  },
+  "bat_elite": {
+   "file": "art/enemies/bat_elite.webp",
+   "scale": 1.9,
+   "dy": 0.55
+  },
+  "zombie_elite": {
+   "file": "art/enemies/zombie_elite.webp",
+   "scale": 1.2
+  },
+  "dragon": {
+   "file": "art/props/wyvern.webp",
+   "scale": 1.0
+  }
+ },
+ "props": {
+  "cart": {
+   "file": "art/props/cart.webp"
+  },
+  "boulder": {
+   "file": "art/props/boulder.webp"
+  },
+  "anvil": {
+   "file": "art/props/anvil.webp"
+  },
+  "cauldron": {
+   "file": "art/props/cauldron.webp"
+  },
+  "chest": {
+   "file": "art/props/chest.webp"
+  },
+  "chest_open": {
+   "file": "art/props/chest_open.webp"
+  },
+  "campfire": {
+   "file": "art/props/campfire.webp"
+  },
+  "rune": {
+   "file": "art/props/rune.webp"
+  },
+  "shrine": {
+   "file": "art/props/shrine.webp"
+  },
+  "dock": {
+   "file": "art/props/dock.webp"
+  },
+  "fish_carp": {
+   "file": "art/props/fish_carp.webp"
+  },
+  "fish_trout": {
+   "file": "art/props/fish_trout.webp"
+  },
+  "fish_pike": {
+   "file": "art/props/fish_pike.webp"
+  },
+  "fish_serpent": {
+   "file": "art/props/fish_serpent.webp"
+  },
+  "shopkeeper": {
+   "file": "art/props/shopkeeper.webp"
+  }
+ },
+ "icons": {
+  "heal": {
+   "file": "art/icons/heal.webp"
+  },
+  "espresso": {
+   "file": "art/icons/espresso.webp"
+  },
+  "tailwind": {
+   "file": "art/icons/tailwind.webp"
+  },
+  "vigor": {
+   "file": "art/icons/vigor.webp"
+  },
+  "chain_mail": {
+   "file": "art/icons/chain_mail.webp"
+  },
+  "carbon_wheels": {
+   "file": "art/icons/carbon_wheels.webp"
+  },
+  "aero_helm": {
+   "file": "art/icons/aero_helm.webp"
+  },
+  "whetstone": {
+   "file": "art/icons/whetstone.webp"
+  },
+  "metronome": {
+   "file": "art/icons/metronome.webp"
+  },
+  "phoenix": {
+   "file": "art/icons/phoenix.webp"
+  },
+  "second_wind": {
+   "file": "art/icons/second_wind.webp"
+  },
+  "gold": {
+   "file": "art/icons/gold.webp"
   }
  }
 }
