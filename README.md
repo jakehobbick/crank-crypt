@@ -1,4 +1,4 @@
-# Crank Crypt
+# WattQuest
 
 A Slay-the-Spire-style dungeon run you play on a smart trainer. Three acts, 15 bosses, 103 achievements, 20 heroes, and a Grimoire (manga) art style.
 
