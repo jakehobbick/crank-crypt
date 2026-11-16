@@ -194,5 +194,27 @@
    "aura": "255,50,50"
   }
  },
- "enemies": {}
+ "enemies": {
+  "skeleton": {
+   "file": "art/enemies/skeleton.webp",
+   "scale": 1.05
+  },
+  "bat": {
+   "file": "art/enemies/bat.webp",
+   "scale": 1.6,
+   "dy": 0.55
+  },
+  "ogre": {
+   "file": "art/enemies/ogre.webp",
+   "scale": 1.0
+  },
+  "zombie": {
+   "file": "art/enemies/zombie.webp",
+   "scale": 1.05
+  },
+  "goblin": {
+   "file": "art/enemies/goblin.webp",
+   "scale": 1.05
+  }
+ }
 }
