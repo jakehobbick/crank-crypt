@@ -137,6 +137,61 @@
   "sovereign": {
    "file": "art/bosses/sovereign.webp",
    "h": 420
+  },
+  "colossus": {
+   "file": "art/bosses/colossus.webp",
+   "h": 330,
+   "aura": "255,120,40"
+  },
+  "slime": {
+   "file": "art/bosses/slime.webp",
+   "h": 300,
+   "aura": "120,255,80"
+  },
+  "mimic": {
+   "file": "art/bosses/mimic.webp",
+   "h": 290,
+   "aura": "255,80,120"
+  },
+  "kraken": {
+   "file": "art/bosses/kraken.webp",
+   "h": 360,
+   "aura": "80,220,255"
+  },
+  "spider": {
+   "file": "art/bosses/spider.webp",
+   "h": 330,
+   "aura": "200,40,40"
+  },
+  "golem": {
+   "file": "art/bosses/golem.webp",
+   "h": 360,
+   "aura": "255,90,30"
+  },
+  "vampire": {
+   "file": "art/bosses/vampire.webp",
+   "h": 340,
+   "aura": "220,30,60"
+  },
+  "minotaur": {
+   "file": "art/bosses/minotaur.webp",
+   "h": 380,
+   "aura": "255,120,60"
+  },
+  "beholder": {
+   "file": "art/bosses/beholder.webp",
+   "h": 340,
+   "aura": "255,60,60"
+  },
+  "dragon": {
+   "file": "art/bosses/dragon.webp",
+   "h": 370,
+   "aura": "255,100,30"
+  },
+  "demon": {
+   "file": "art/bosses/demon.webp",
+   "h": 380,
+   "aura": "255,50,50"
   }
  },
  "enemies": {}
