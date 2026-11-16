@@ -210,7 +210,8 @@
   },
   "zombie": {
    "file": "art/enemies/zombie.webp",
-   "scale": 1.05
+   "scale": 1.05,
+   "flip": true
   },
   "goblin": {
    "file": "art/enemies/goblin_archer.webp",
@@ -227,7 +228,8 @@
   },
   "zombie_elite": {
    "file": "art/enemies/zombie_elite.webp",
-   "scale": 1.2
+   "scale": 1.2,
+   "flip": true
   },
   "dragon": {
    "file": "art/props/wyvern.webp",
