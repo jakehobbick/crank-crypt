@@ -448,6 +448,11 @@ function readSensors(dt){
   sens.smooth+=(sens.power-sens.smooth)*(1-Math.exp(-dt/1.4));
   sens.cadSm+=(sens.cad-sens.cadSm)*(1-Math.exp(-dt/0.8));
 }
+/* 5-second target average: resets whenever the room's target changes */
+const AVG_WIN=5,avgBuf=[];let avgT=0,avgKeyLast=undefined,gaugeLive=null;
+function avgReset(){avgBuf.length=0}
+function avgPush(dt,p){avgT+=dt;avgBuf.push([avgT,dt,p]);while(avgBuf.length&&avgBuf[0][0]<avgT-AVG_WIN)avgBuf.shift()}
+function avgP(){let w=0,s=0;for(const [,d,p] of avgBuf){w+=d;s+=d*p}return w>0?s/w:sens.power}
 function updateDemoVis(){const on=sens.src==='demo'&&state.screen!=='title'&&state.screen!=='end';$('demo').classList.toggle('on',on);demoH=on?$('demo').offsetHeight:0;document.documentElement.style.setProperty('--demoH',demoH+'px');if(typeof updateGearUI==='function')updateGearUI();$('map').classList.toggle('demo',on);$('dmW').textContent=Math.round(demo.watts);$('dmC').textContent=Math.round(demo.cad)}
 
 /* =========================================================
@@ -1638,9 +1643,10 @@ function drawGauge(c,P,zones,o={}){
   for(const z of zones){c.fillStyle=z.color;c.fillRect(X(z.lo),y,Math.max(2,X(z.hi)-X(z.lo)),h);if(z.label){c.fillStyle='#fff';c.font='700 11px Inter';c.textAlign='center';c.fillText(z.label,(X(z.lo)+X(Math.min(z.hi,max)))/2,y+15)}}
   c.fillStyle='rgba(255,255,255,.35)';c.font='600 10px Inter';c.textAlign='center';
   for(const f of [.5,1,1.5]){const xx=X(f*F());c.fillRect(xx,y+h,1,5);c.fillText(Math.round(f*100)+'%'+(fgOn()?' · '+Math.round(rpmFor(f*F(),trainerTarget.g))+'rpm':''),xx,y+h+15)}
+  if(gaugeLive!=null){const lx=X(gaugeLive);c.fillStyle='rgba(255,255,255,.45)';c.fillRect(lx-1,y-3,2,h+6);c.font='600 10px Inter';c.textAlign='center';c.fillText('live',lx,y-6)}
   if(o.marker!=null){const mx=X(o.marker);c.fillStyle='#ff6b6f';c.beginPath();c.moveTo(mx,y-2);c.lineTo(mx-6,y-10);c.lineTo(mx+6,y-10);c.fill()}
   const nx=X(P);c.fillStyle='#fff';c.shadowColor='#fff';c.shadowBlur=8;c.fillRect(nx-2,y-6,4,h+12);c.shadowBlur=0;
-  c.font='700 16px "Barlow Condensed"';c.textAlign='left';c.fillStyle='#fff';c.fillText(o.label||'POWER',x,y-9);
+  c.font='700 16px "Barlow Condensed"';c.textAlign='left';c.fillStyle='#fff';c.fillText(o.label||(gaugeLive!=null?'POWER · 5 S AVG':'POWER'),x,y-9);
   c.textAlign='right';c.fillText(Math.round(P)+' W',x+w,y-9);
 }
 function rrect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
@@ -1781,7 +1787,8 @@ class BandHold{
   constructor(o){Object.assign(this,o);this.t=0;this.out=0;this.win=0;this.swing=0;this.enemies=[];this.inBandT=0;
     const total=this.dps*this.dur*.72;const n=Math.max(4,Math.round(total/this.ehp));for(let i=0;i<n;i++)this.enemies.push({hp:this.ehp,max:this.ehp,x:0,seed:i*1.7});
     this.retarget();this.trainer={mode:'sim',g:this.grade}}
-  retarget(){[this.lo,this.hi]=bandAdj(this.blo,this.bhi)}
+  retarget(){[this.lo,this.hi]=bandAdj(this.blo-.03,this.bhi+.03)}
+  avgKey(){return this.lo+'|'+this.hi}
   get objective(){return `Hold <b>${Math.round(this.lo*F())}–${Math.round(this.hi*F())} W</b> to cut through ${this.enemies.length} ${this.foe}s. Too hard is sloppy, too easy and they hit you.`}
   timeLeft(){return this.dur-this.t}
   update(dt,P){
@@ -1815,6 +1822,7 @@ class Sprint{
   constructor(o){Object.assign(this,o);this.t=0;this.wave=0;this.phase='rest';this.pt=this.firstRest||10;this.meter=0;this.cleared=0;this.bats=[];this.lastBeep=99;
     this.retarget();this.trainer={mode:'sim',g:1};this.spawnBats()}
   retarget(){this.thr=sprintThr(this.thrF)}
+  avgKey(){return this.phase+'|'+this.wave}
   get objective(){return `${this.waves} swarms. When they dive, sprint above <b>${Math.round(this.thr*F())} W</b> and fill the meter within ${this.window}s. Recover between waves.`}
   spawnBats(){this.bats=[];for(let i=0;i<14;i++)this.bats.push({ax:rnd(.45,.95),ay:rnd(.12,.45),ph:rnd(0,7),sp:rnd(.6,1.4)})}
   timeLeft(){return this.phase==='rest'?this.pt:this.phase==='warn'?this.pt:this.pt}
@@ -2424,6 +2432,7 @@ const PHASE_DESC={band:(o)=>`hold <b>${Math.round(o.lo*F())}–${Math.round(o.hi
 class BossFight{
   constructor(key,act){this.key=key;this.def=BOSSES[key];this.act=act;this.aS=1+act*.03;this.hit=1+act*.3;this.D=330;this.hp=this.max=1100;this.t=0;this.pi=-1;this.swing=0;this.hist=[];this.nextPhase()}
   get phaseCount(){return this.def.phases.length}
+  avgKey(){const o=this.o;if(!['band','sprint','tug'].includes(o.k))return null;return this.pi+'|'+(o.ph||'')+'|'+(o.wave||0)+'|'+(o.sg>0?1:0)}
   get dur(){return null}
   nextPhase(){this.pi++;const base=this.pi<this.def.phases.length?this.def.phases[this.pi]:{k:'sprint',name:'Final Stand',waves:99,thr:1.22};
     const o=this.o={...base};this.pt=0;const aS=this.aS;
@@ -3072,7 +3081,11 @@ let last=performance.now(),sampleAcc=0,hudAcc=0,trAcc=0;
 function loop(now){
   const dt=Math.min(.1,(now-last)/1000);last=now;ambT+=dt;
   readSensors(dt);trAcc+=dt;if(trAcc>.5){trAcc=0;applyTrainer(false);if(fgOn())updatePill()}
-  const P=sens.power,cad=sens.cad;
+  const cad=sens.cad;
+  const aKey=(state.screen==='room'&&game&&game.avgKey)?game.avgKey():null;
+  if(aKey!==avgKeyLast){avgReset();avgKeyLast=aKey}
+  avgPush(dt,sens.power);
+  const P=aKey!=null?avgP():sens.power;gaugeLive=aKey!=null?sens.power:null;
   heroPhase+=(cad>0?cad:0)/60*Math.PI*2*dt;
   if(run&&!state.paused&&state.screen!=='title'&&state.screen!=='end'){
     sampleAcc+=dt;while(sampleAcc>=1){sampleAcc-=1;run.samples.push({t:Date.now(),p:Math.round(sens.power),c:Math.round(sens.cad),hr:sens.hr});achEvent('tick')}
@@ -3086,7 +3099,7 @@ function loop(now){
     dungeonBG(ctx,ambT*8,ambT);drawHero(ctx,W*.5,groundY(),1.2*sc());
   }
   updParts(state.paused?0:dt);drawParts(ctx);ambientFX(ctx,dt);vignette(ctx);grimImpact(ctx);ctx.restore();
-  hudAcc+=dt;if(hudAcc>.15){hudAcc=0;$('lvP').textContent=Math.round(P);$('lvC').textContent=Math.round(cad);$('lvHRw').style.display=sens.hr>0?'':'none';$('lvHR').textContent=sens.hr;
+  hudAcc+=dt;if(hudAcc>.15){hudAcc=0;$('lvP').textContent=Math.round(sens.power);$('lvC').textContent=Math.round(cad);$('lvHRw').style.display=sens.hr>0?'':'none';$('lvHR').textContent=sens.hr;
     if(sens.src==='demo'){$('dmW').textContent=Math.round(demo.watts);$('dmC').textContent=Math.round(demo.cad)}}
   requestAnimationFrame(loop);
 }
