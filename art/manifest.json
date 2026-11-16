@@ -318,5 +318,39 @@
   "gold": {
    "file": "art/icons/gold.webp"
   }
+ },
+ "map": {
+  "fight": {
+   "file": "art/map/fight.webp"
+  },
+  "elite": {
+   "file": "art/map/elite.webp"
+  },
+  "shop": {
+   "file": "art/map/shop.webp"
+  },
+  "rest": {
+   "file": "art/map/rest.webp"
+  },
+  "mini": {
+   "file": "art/map/mini.webp"
+  },
+  "boss": {
+   "file": "art/map/boss.webp"
+  }
+ },
+ "bg": {
+  "act0": {
+   "file": "art/bg/act0.webp",
+   "floor": 0.78
+  },
+  "act1": {
+   "file": "art/bg/act1.webp",
+   "floor": 0.78
+  },
+  "act2": {
+   "file": "art/bg/act2.webp",
+   "floor": 0.78
+  }
  }
 }

@@ -614,6 +614,13 @@ function rockPile(c,x,y,s,flip,P){c.save();c.translate(x,y);if(flip)c.scale(-1,1
   c.restore()}
 function dungeonBG(c,scroll,t,o={}){
   const P=pal(),gy=groundY(),s=sc();
+  {const A=ART.bg['act'+(run?clamp(run.act||0,0,2):0)];if(artReady(A)){const im=A.im,iw=im.naturalWidth,ih=im.naturalHeight,fl=A.floor??.8,k=Math.max(W/iw,H/ih,(gy)/(ih*fl)),dw=iw*k*1.04,dh=ih*k*1.04;
+    const dy=Math.min(0,Math.max(H-dh,gy-fl*dh)),drift=((scroll*.15)%(dw-W+1));const dx=-(dw-W)/2+Math.sin(scroll*.002)*(dw-W)/2;
+    c.drawImage(im,dx,dy,dw,dh);if(o.tint){c.fillStyle=o.tint;c.fillRect(0,0,W,H)}
+    for(let i=0;i<5;i++){const lx=((hash(i*9)*W+t*(10+i*4)*s)%(W+80))-40,ly=gy*(.3+hash(i*4)*.5)+Math.sin(t*.8+i)*10*s;c.save();c.globalCompositeOperation='lighter';const lg=c.createRadialGradient(lx,ly,0,lx,ly,10*s);lg.addColorStop(0,'rgba(255,170,90,.5)');lg.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=lg;c.fillRect(lx-12*s,ly-12*s,24*s,24*s);c.restore()}
+    const fg2=c.createLinearGradient(0,gy-40*s,0,H);fg2.addColorStop(0,'rgba(0,0,0,0)');fg2.addColorStop(1,'rgba(0,0,0,.35)');c.fillStyle=fg2;c.fillRect(0,gy-40*s,W,H);
+    const tg=c.createLinearGradient(0,0,0,gy*.3);tg.addColorStop(0,'rgba(0,0,0,.45)');tg.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=tg;c.fillRect(0,0,W,gy*.3);
+    grimScene(c);return}}
   const sky=c.createLinearGradient(0,0,0,gy);sky.addColorStop(0,P.sky[0]);sky.addColorStop(1,P.sky[1]);c.fillStyle=sky;c.fillRect(0,0,W,gy);
   c.save();c.globalCompositeOperation='lighter';const hz=c.createRadialGradient(W*.5,gy*.75,10,W*.5,gy*.75,W*.6);hz.addColorStop(0,`rgba(${P.fog},.18)`);hz.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=hz;c.fillRect(0,0,W,gy);c.restore();
   farCity(c,scroll,t,P,gy,s);
@@ -1385,13 +1392,14 @@ function _drawDragon(c,x,y,s,t,o){
 
 let heroHP=false;
 /* ---------- external art: art/manifest.json lists every painted image ---------- */
-const ART={heroes:{},bosses:{},enemies:{},props:{},icons:{}},SPR={},SPRITE_META={};
+const ART={heroes:{},bosses:{},enemies:{},props:{},icons:{},map:{},bg:{}},SPR={},SPRITE_META={};
 function artReady(e){return e&&e.im&&e.im.complete&&e.im.naturalWidth>0}
 function loadArt(){
   fetch('art/manifest.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(m=>{if(!m)return;
-    for(const cat of ['heroes','bosses','enemies','props','icons'])for(const k in (m[cat]||{})){const e={...m[cat][k]};const im=new Image();im.decoding='async';im.src=e.file;e.im=im;ART[cat][k]=e;
+    for(const cat of ['heroes','bosses','enemies','props','icons','map','bg'])for(const k in (m[cat]||{})){const e={...m[cat][k]};const im=new Image();im.decoding='async';im.src=e.file;e.im=im;ART[cat][k]=e;
       if(cat==='heroes'){SPR[k]=im;SPRITE_META[k]=e}}
-  }).catch(()=>{})}
+  if(typeof renderMap==='function'&&run&&state.screen==='map')setTimeout(()=>{try{renderMap()}catch(e){}},800);updateLegend();}).catch(()=>{})}
+function updateLegend(){setTimeout(()=>{const L=document.querySelector('.legend');if(!L)return;const it=[['fight','Monsters'],['elite','Elite'],['mini','Mini-game'],['rest','Rest'],['shop','Shop'],['boss','Boss']];if(!it.every(([k])=>artReady(ART.map[k]))){if((updateLegend.n=(updateLegend.n||0)+1)<20)updateLegend();return}L.innerHTML=it.map(([k,n])=>`<span><img src="${ART.map[k].file}" alt="" style="height:22px;vertical-align:middle;margin-right:3px">${n}</span>`).join('')},900)}
 loadArt();
 function heroHasArt(id){return artReady(ART.heroes[id])}
 function propArt(k,c,x,y,h,o={}){const A=ART.props[k];if(!artReady(A))return false;const im=A.im,hh=h*(A.scale||1),ww=hh*im.naturalWidth/im.naturalHeight;c.save();
@@ -1787,6 +1795,7 @@ function availableNodes(){
   return [...run.cur.next].map(c=>m.nodes[run.cur.r+1][c]);
 }
 let mapSel=0;
+function mapIco(t,x,y,r,done){const k=t==='boss'?'boss':t,A=ART.map[k];if(!artReady(A))return '';const iw=A.im.naturalWidth,ih=A.im.naturalHeight,D=(A.d||225),sc2=(r*2.35)/D,w=iw*sc2,h=ih*sc2,cy=A.cy??(1-D/2/ih);return `<image href="${A.file}" x="${x-w/2}" y="${y-cy*h}" width="${w}" height="${h}" opacity="${done?.45:1}" style="pointer-events:none"/>`}
 function renderMap(){
   const m=run.map,svg=$('mapSvg');const cw=Math.min(W-20,matchMedia('(pointer:coarse)').matches?560:460),rowH=matchMedia('(pointer:coarse)').matches?96:86,top=70,h=top+rowH*(m.rows)+40;
   const colW=(cw-60)/(m.cols-1);
@@ -1800,7 +1809,7 @@ function renderMap(){
   const all=[...m.nodes.flat().filter(Boolean),m.boss];
   for(const n of all){const [x,y]=P(n);const touch=matchMedia('(pointer:coarse)').matches;const r=n.type==='boss'?(touch?34:30):(touch?25:20);
     const avArr=[...avail];const cls=['node',avail.has(n)?'avail':'',n.done?'done':'',n===run.cur?'cur':'',avArr[mapSel%Math.max(1,avArr.length)]===n?'sel':''].join(' ');
-    s+=`<g class="${cls}" data-id="${n.type==='boss'?'boss':n.r+'-'+n.c}">${avail.has(n)?`<circle class="pulse" cx="${x}" cy="${y}" r="${r+4}" fill="#ffb35a"/>`:''}<circle class="bg" cx="${x}" cy="${y}" r="${r}"/><text x="${x}" y="${y+1}" text-anchor="middle" dominant-baseline="central" font-size="${n.type==='boss'?30:19}" opacity="${n.done?.45:1}">${n.type==='boss'?BOSSES[run.bosses[run.act]].ic:ICON[n.type]}</text></g>`}
+    s+=`<g class="${cls}" data-id="${n.type==='boss'?'boss':n.r+'-'+n.c}">${avail.has(n)?`<circle class="pulse" cx="${x}" cy="${y}" r="${r+4}" fill="#ffb35a"/>`:''}<circle class="bg" cx="${x}" cy="${y}" r="${r}"/>${mapIco(n.type,x,y,r,n.done)}<text style="${artReady(ART.map[n.type==='boss'?'boss':n.type])?'display:none':''}" x="${x}" y="${y+1}" text-anchor="middle" dominant-baseline="central" font-size="${n.type==='boss'?30:19}" opacity="${n.done?.45:1}">${n.type==='boss'?BOSSES[run.bosses[run.act]].ic:ICON[n.type]}</text></g>`}
   svg.setAttribute('width',cw);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${cw} ${h}`);svg.innerHTML=s;
   svg.querySelectorAll('.node.avail').forEach(g=>g.onclick=()=>{const id=g.dataset.id;const n=id==='boss'?m.boss:m.nodes[+id.split('-')[0]][+id.split('-')[1]];enterNode(n)});
   const floorTxt=run.cur==null?'Floor 1':run.cur==='boss'?'':'Floor '+Math.min(m.rows,(run.cur.r+2));
