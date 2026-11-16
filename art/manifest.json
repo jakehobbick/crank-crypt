@@ -1,0 +1,143 @@
+{
+ "heroes": {
+  "kai": {
+   "file": "art/heroes/kai.webp",
+   "l": 0.0344,
+   "r": 0.9953,
+   "b": 0.9983
+  },
+  "bram": {
+   "file": "art/heroes/bram.webp",
+   "l": 0.1906,
+   "r": 0.9969,
+   "b": 0.9978
+  },
+  "sable": {
+   "file": "art/heroes/sable.webp",
+   "l": 0.1906,
+   "r": 0.9984,
+   "b": 0.9978
+  },
+  "luna": {
+   "file": "art/heroes/luna.webp",
+   "l": 0.1906,
+   "r": 0.9984,
+   "b": 0.9978
+  },
+  "grim": {
+   "file": "art/heroes/grim.webp",
+   "l": 0.1906,
+   "r": 0.9984,
+   "b": 0.9978
+  },
+  "ash": {
+   "file": "art/heroes/ash.webp",
+   "l": 0.2094,
+   "r": 0.9984,
+   "b": 0.9978
+  },
+  "zephyr": {
+   "file": "art/heroes/zephyr.webp",
+   "l": 0.0047,
+   "r": 0.9969,
+   "b": 0.9981
+  },
+  "torvin": {
+   "file": "art/heroes/torvin.webp",
+   "l": 0.0031,
+   "r": 0.9984,
+   "b": 0.9982
+  },
+  "nami": {
+   "file": "art/heroes/nami.webp",
+   "l": 0.0156,
+   "r": 0.9984,
+   "b": 0.9847
+  },
+  "mira": {
+   "file": "art/heroes/mira.webp",
+   "l": 0.0156,
+   "r": 0.9859,
+   "b": 0.9837
+  },
+  "frost": {
+   "file": "art/heroes/frost.webp",
+   "l": 0.0125,
+   "r": 0.9859,
+   "b": 0.984
+  },
+  "volt": {
+   "file": "art/heroes/volt.webp",
+   "l": 0.0156,
+   "r": 0.9859,
+   "b": 0.9841
+  },
+  "ember": {
+   "file": "art/heroes/ember.webp",
+   "l": 0.0781,
+   "r": 0.9984,
+   "b": 0.9859
+  },
+  "sol": {
+   "file": "art/heroes/sol.webp",
+   "l": 0.0,
+   "r": 0.9984,
+   "b": 0.9844
+  },
+  "vex": {
+   "file": "art/heroes/vex.webp",
+   "l": 0.025,
+   "r": 0.9859,
+   "b": 0.9838
+  },
+  "pip": {
+   "file": "art/heroes/pip.webp",
+   "l": 0.0156,
+   "r": 0.9859,
+   "b": 0.9832
+  },
+  "rin": {
+   "file": "art/heroes/rin.webp",
+   "l": 0.0156,
+   "r": 0.9984,
+   "b": 0.9853
+  },
+  "thorn": {
+   "file": "art/heroes/thorn.webp",
+   "l": 0.0,
+   "r": 0.9906,
+   "b": 0.9844
+  },
+  "tide": {
+   "file": "art/heroes/tide.webp",
+   "l": 0.0234,
+   "r": 0.9828,
+   "b": 0.9844
+  },
+  "champ": {
+   "file": "art/heroes/champ.webp",
+   "l": 0.0281,
+   "r": 0.9828,
+   "b": 0.9856
+  }
+ },
+ "bosses": {
+  "lich": {
+   "file": "art/bosses/lich.webp",
+   "h": 320
+  },
+  "herald": {
+   "file": "art/bosses/herald.webp",
+   "h": 335
+  },
+  "empress": {
+   "file": "art/bosses/empress.webp",
+   "h": 340
+  },
+  "sovereign": {
+   "file": "art/bosses/sovereign.webp",
+   "h": 420
+  }
+ },
+ "enemies": {}
+}
